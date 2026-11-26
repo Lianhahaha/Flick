@@ -14,12 +14,16 @@ All notable changes to Flick are documented here. The format follows
 - FAQ, project comparison, and demo README
 - Relative Markdown link checker
 - Citation metadata
+- README logo, badges, requirements, and documentation map
+- macOS/Linux setup notes
+- ReelMimic OpenCode screenshot
 
 ### Changed
 
 - GitHub Actions updated to v7
 - Quickstart renamed and updated for OpenCode/bootstrap
 - Removed a duplicate demo audio file
+- Roadmap updated with OpenCode and public-polish status
 
 ## [0.2.0] — 2026-11-26
 
