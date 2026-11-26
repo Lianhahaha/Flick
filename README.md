@@ -17,7 +17,7 @@ The demo output is a **9.3-second, 1920×1080 anime-cel clip**: Hina walks in
 from the left, stops, and speaks. Her voice is generated locally with Piper TTS,
 and her mouth is driven by Rhubarb Lip Sync cues rather than a random lip flap.
 
-https://github.com/Lianhahaha/Flick
+[Watch the demo](demo/hina-walking-talking.mp4) · [What happens in it](demo/README.md) · [How it works](docs/architecture.md)
 
 ---
 
