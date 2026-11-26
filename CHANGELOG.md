@@ -9,8 +9,17 @@ All notable changes to Flick are documented here. The format follows
 ### Added
 
 - Contributor guide, code of conduct, security policy, and changelog
-- GitHub issue/PR templates and CI
+- GitHub issue/PR templates, Dependabot, and CI
 - EditorConfig and additional ignore rules
+- FAQ, project comparison, and demo README
+- Relative Markdown link checker
+- Citation metadata
+
+### Changed
+
+- GitHub Actions updated to v7
+- Quickstart renamed and updated for OpenCode/bootstrap
+- Removed a duplicate demo audio file
 
 ## [0.2.0] — 2026-11-26
 
