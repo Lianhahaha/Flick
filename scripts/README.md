@@ -13,6 +13,7 @@ Options:
 | Flag | Effect |
 |---|---|
 | `-WithToonflow` | Also clone Toonflow (reference only) |
+| `-WithOpenCode` | Apply the OpenCode director patch to ReelMimic |
 | `-SkipReelMimic` | Do not clone ReelMimic |
 
 What it downloads:

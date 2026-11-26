@@ -26,6 +26,7 @@ https://github.com/Lianhahaha/Flick
 | 2D anime character walking | ✅ Works |
 | 2D anime character talking with voice | ✅ Works |
 | 9.3 s rendered MP4 with audio | ✅ Works |
+| OpenCode director (DeepSeek V4.1 Flash) | ✅ Works via local patch |
 | Tagalog/Filipino support | ⚠️ Phonetic recognizer; needs a Filipino voice model |
 | Multi-character dialogue scene | 🔜 Next |
 | Full ReelMimic production integration | 🔜 Next |
@@ -59,6 +60,9 @@ docs/
   setup.md                     install and run
   roadmap.md                   what to build next
   licensing.md                 rights, licenses, and client-work notes
+  opencode-adapter.md          run ReelMimic with DeepSeek via OpenCode
+patches/
+  reelmimic-opencode-agent.patch
 scripts/
   bootstrap.ps1                clone upstreams + download voice tools/models
 third_party/                   redistributable license texts
@@ -84,11 +88,12 @@ commands.
 ### 1. Bootstrap the upstream tools
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1
+powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1 -WithOpenCode
 ```
 
-This clones ReelMimic and optionally Toonflow, then downloads the Piper and
-Rhubarb Windows binaries and the English voice model. It does not install
+This clones ReelMimic and optionally Toonflow, applies the OpenCode director
+patch, then downloads the Piper and Rhubarb Windows binaries and the English
+voice model. It does not install
 ReelMimic's Python/npm dependencies; do that with ReelMimic's `install.bat`.
 
 ### Collaborator setup (fresh clone)
@@ -101,8 +106,10 @@ cd reelmimic
 install.bat
 ```
 
-That gives the same setup as this machine: ReelMimic, Piper, Rhubarb, and the
-voice model. The demo video is already in the repo.
+That gives the same setup as this machine: ReelMimic, the OpenCode director
+patch, Piper, Rhubarb, and the voice model. The demo video is already in the
+repo. See [`docs/opencode-adapter.md`](docs/opencode-adapter.md) for the
+DeepSeek configuration.
 
 ### 2. Try the standalone voice demo
 

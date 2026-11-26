@@ -14,10 +14,14 @@
 
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1 -WithToonflow
+
+.EXAMPLE
+  powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1 -WithOpenCode
 #>
 
 param(
   [switch]$WithToonflow,
+  [switch]$WithOpenCode,
   [switch]$SkipReelMimic
 )
 
@@ -62,6 +66,28 @@ if (-not $SkipReelMimic) {
   } else {
     & git clone --depth 1 https://github.com/edenfunf/reelmimic.git (Join-Path $Root "reelmimic")
     if ($LASTEXITCODE -ne 0) { throw "git clone reelmimic failed" }
+  }
+}
+
+if ($WithOpenCode) {
+  Write-Step "OpenCode director patch"
+  $reel = Join-Path $Root "reelmimic"
+  $patch = Join-Path $Root "patches\reelmimic-opencode-agent.patch"
+  if (-not (Test-Path (Join-Path $reel ".git"))) {
+    Write-Warning "reelmimic is not present; run without -SkipReelMimic first"
+  } elseif (-not (Test-Path $patch)) {
+    Write-Warning "patch not found: $patch"
+  } elseif (Select-String -Path (Join-Path $reel "app\shared\types.ts") -Pattern "opencode" -Quiet) {
+    Write-Host "  already applied"
+  } else {
+    & git -C $reel apply --check $patch
+    if ($LASTEXITCODE -eq 0) {
+      & git -C $reel apply $patch
+      if ($LASTEXITCODE -ne 0) { throw "git apply failed" }
+      Write-Host "  applied: $patch"
+    } else {
+      Write-Warning "patch does not apply cleanly; try: git -C reelmimic apply -3 ..\patches\reelmimic-opencode-agent.patch"
+    }
   }
 }
 

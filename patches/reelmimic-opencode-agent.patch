@@ -1,0 +1,287 @@
+From aaa7677934639f5cb8d0a2ff302b51df78985f5e Mon Sep 17 00:00:00 2001
+From: Lianhahaha <itsmecalcheese@gmail.com>
+Date: Thu, 26 Nov 2026 21:02:03 +0800
+Subject: [PATCH] feat: add OpenCode agent adapter
+
+---
+ app/server/agents/index.test.ts | 29 +++++++++++++++++---
+ app/server/agents/index.ts      | 48 ++++++++++++++++++++++++++-------
+ app/server/env.ts               |  2 +-
+ app/server/index.ts             |  2 +-
+ app/shared/types.ts             |  4 +--
+ app/web/src/App.tsx             | 13 ++++++---
+ app/web/src/Chat.tsx            |  4 ++-
+ 7 files changed, 82 insertions(+), 20 deletions(-)
+
+diff --git a/app/server/agents/index.test.ts b/app/server/agents/index.test.ts
+index ea1a0df..2ce20fc 100644
+--- a/app/server/agents/index.test.ts
++++ b/app/server/agents/index.test.ts
+@@ -2,7 +2,7 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+ import type { AgentEvent } from '../../shared/types.ts';
+-import { feedStdout, noteDropped, parseClaude, parseCodex } from './index.ts';
++import { feedStdout, noteDropped, parseClaude, parseCodex, parseOpencode } from './index.ts';
+ 
+ const run = (parse: typeof parseClaude, lines: object[]) => {
+   const events: AgentEvent[] = [], st = { sessionId: null, text: '', ok: false, cost: null, lastError: '' };
+@@ -53,6 +53,29 @@ test('Codex stream', () => {
+   assert.equal(st.ok, true);
+ });
+ 
++test('OpenCode stream', () => {
++  const { events, st } = run(parseOpencode, [
++    { type: 'step_start', sessionID: 'o1' },
++    { type: 'tool_use', sessionID: 'o1', part: { tool: 'write', state: { input: { path: 'hello.txt' } } } },
++    { type: 'text', sessionID: 'o1', part: { text: 'done' } },
++    { type: 'step_finish', sessionID: 'o1', part: { reason: 'stop', cost: 0.01 } },
++  ]);
++  assert.deepEqual(events, [
++    { type: 'session', id: 'o1' },
++    { type: 'tool', name: 'write', detail: 'hello.txt' },
++    { type: 'text', text: 'done' },
++  ]);
++  assert.equal(st.ok, true);
++  assert.equal(st.text, 'done');
++  assert.equal(st.cost, 0.01);
++});
++
++test('OpenCode failure emits an error', () => {
++  const { events, st } = run(parseOpencode, [{ type: 'step_finish', part: { reason: 'error' } }]);
++  assert.equal(st.ok, false);
++  assert.deepEqual(events, [{ type: 'error', text: 'OpenCode step ended: error' }]);
++});
++
+ test('Codex failure emits an error', () => {
+   const { events, st } = run(parseCodex, [{ type: 'turn.failed', error: { message: 'usage limit reached' } }]);
+   assert.equal(st.ok, false);
+@@ -70,8 +93,8 @@ test('non-JSON stdout lines are counted, valid lines still parse', () => {
+   const events: AgentEvent[] = [], st = { sessionId: null, text: '', ok: false, cost: null, lastError: '' };
+   const drop = { n: 0, sample: '' };
+   const emit = (e: AgentEvent) => { if (e.type === 'error') st.lastError = e.text; events.push(e); };
+-  feedStdout('not json {', true, emit, st, drop);
+-  feedStdout('{"type":"result","subtype":"success","is_error":false,"result":"hi"}', true, emit, st, drop);
++  feedStdout('not json {', 'claude', emit, st, drop);
++  feedStdout('{"type":"result","subtype":"success","is_error":false,"result":"hi"}', 'claude', emit, st, drop);
+   assert.equal(drop.n, 1);
+   assert.equal(drop.sample, 'not json {');
+   assert.equal(st.text, 'hi');
+diff --git a/app/server/agents/index.ts b/app/server/agents/index.ts
+index f3c321d..dc648b0 100644
+--- a/app/server/agents/index.ts
++++ b/app/server/agents/index.ts
+@@ -23,6 +23,9 @@ const IS_WIN = process.platform === 'win32';
+ const NPM_CODEX = IS_WIN && process.env.APPDATA ? join(process.env.APPDATA, 'npm', 'codex.cmd') : null;
+ // Resolved per call, not at load, so a codex installed through npm after the server started is found on the next probe
+ const codexBin = () => process.env.CODEX_BIN || (NPM_CODEX && existsSync(NPM_CODEX) ? NPM_CODEX : 'codex');
++const opencodeBin = () => process.env.OPENCODE_BIN || 'opencode';
++const opencodeModel = () => process.env.OPENCODE_MODEL || 'opencode-go/deepseek-v4.1-flash';
++const opencodeAgent = () => process.env.OPENCODE_AGENT || 'build';
+ const CLAUDE_TOOLS = 'Bash,Read,Write,Edit,Glob,Grep,Skill,WebFetch,WebSearch,TodoWrite';
+ 
+ export interface AgentRun {
+@@ -55,8 +58,8 @@ function probe(cmd: string): Promise<string | null> {
+ }
+ 
+ export async function agentStatus(): Promise<AgentStatus> {
+-  const [claude, codex] = await Promise.all([probe('claude'), probe(codexBin())]);
+-  return { claude, codex };
++  const [claude, codex, opencode] = await Promise.all([probe('claude'), probe(codexBin()), probe(opencodeBin())]);
++  return { claude, codex, opencode };
+ }
+ 
+ function lines(stream: Readable, onLine: (l: string) => void) {
+@@ -106,13 +109,41 @@ export function parseCodex(obj: Json, emit: Emit, st: TurnState) {
+   if (obj.type === 'turn.failed' || obj.type === 'error') { st.ok = false; emit({ type: 'error', text: short(obj.error?.message || obj.message || obj, 400) }); }
+ }
+ 
++function opencodeArgs(sessionId?: string | null) {
++  // `opencode run` reads the prompt from stdin when no message argument is given, so the prompt never hits a command line.
++  // --auto auto-approves tool calls (the app's own gates still decide what is accepted); --format json is the event stream.
++  const a = ['run', '--format', 'json', '--auto', '--model', opencodeModel(), '--agent', opencodeAgent()];
++  if (sessionId) a.push('--session', sessionId);
++  return a;
++}
++export function parseOpencode(obj: Json, emit: Emit, st: TurnState) {
++  const id = obj.sessionID || obj.session_id;
++  if (id && id !== st.sessionId) { st.sessionId = id; emit({ type: 'session', id }); }
++  const p = obj.part || {};
++  if (obj.type === 'text' && p.text) { st.text = p.text; emit({ type: 'text', text: p.text }); }
++  if (obj.type === 'reasoning' && (p.text || '').trim()) emit({ type: 'thinking', text: short(p.text, 1200) });
++  if (obj.type === 'tool_use') {
++    const input = p.state?.input || {};
++    emit({ type: 'tool', name: p.tool || 'tool', detail: short(input.command || input.path || input.filePath || input.pattern || input) });
++  }
++  if (obj.type === 'step_finish') {
++    const reason = p.reason;
++    st.ok = reason !== 'error' && reason !== 'length';
++    if (typeof p.cost === 'number') st.cost = p.cost;
++    if (!st.ok) emit({ type: 'error', text: `OpenCode step ended: ${reason || 'unknown'}` });
++  }
++  if (obj.type === 'error') { st.ok = false; emit({ type: 'error', text: short(obj.error?.message || obj.message || obj, 400) }); }
++}
++
+ export interface DropTrack { n: number; sample: string }
+ // One stdout line: valid JSON goes to the parsers; anything else is counted
+ // (CLI warnings, truncated lines) instead of vanishing without a trace.
+-export function feedStdout(l: string, isClaude: boolean, emit: Emit, st: TurnState, drop: DropTrack): void {
++export function feedStdout(l: string, kind: AgentKind, emit: Emit, st: TurnState, drop: DropTrack): void {
+   let obj: Json;
+   try { obj = JSON.parse(l); } catch { drop.n++; if (!drop.sample) drop.sample = l.slice(0, 200); return; }
+-  (isClaude ? parseClaude : parseCodex)(obj, emit, st);
++  if (kind === 'claude') parseClaude(obj, emit, st);
++  else if (kind === 'codex') parseCodex(obj, emit, st);
++  else parseOpencode(obj, emit, st);
+ }
+ // At turn end: if the CLI produced no text and nothing else explains why, say
+ // what was dropped so the error card names a cause instead of going out blank.
+@@ -126,23 +157,22 @@ export function runAgent({ kind, cwd, prompt, sessionId, onEvent = () => {}, sig
+     const st: TurnState = { sessionId, text: '', ok: false, cost: null, lastError: '' };
+     const emit: Emit = (e) => { if (e.type === 'error') st.lastError = e.text; onEvent(e); };   // keep the last error for the job's error card
+     const drop: DropTrack = { n: 0, sample: '' };
+-    const isClaude = kind === 'claude';
+-    const cmd = isClaude ? 'claude' : codexBin();
+-    const args = isClaude ? claudeArgs(sessionId) : codexArgs(sessionId, cwd);
++    const cmd = kind === 'claude' ? 'claude' : kind === 'codex' ? codexBin() : opencodeBin();
++    const args = kind === 'claude' ? claudeArgs(sessionId) : kind === 'codex' ? codexArgs(sessionId, cwd) : opencodeArgs(sessionId);
+     // Windows: npm shims (claude.cmd) need a shell; args are fixed literals, the prompt goes through stdin.
+     // its own process group (POSIX), so a cancel stops the renders and browsers it started too, not only the CLI
+     const child = spawn(cmd, args, { cwd, shell: IS_WIN, ...treeOpts, env: { ...process.env, ...env, HYPERFRAMES_NO_TELEMETRY: '1', DO_NOT_TRACK: '1' } });
+     // the signal lives as long as the whole flow: drop the listener when this turn ends, so finished children aren't killed (or kept) later
+     const onAbort = () => killTree(child);
+     if (signal) { if (signal.aborted) killTree(child); else signal.addEventListener('abort', onAbort, { once: true }); }
+-    lines(child.stdout, (l) => feedStdout(l, isClaude, emit, st, drop));
++    lines(child.stdout, (l) => feedStdout(l, kind, emit, st, drop));
+     let err = '';
+     lines(child.stderr, (l) => { err += l + '\n'; if (!/^\s*$/.test(l) && !/DeprecationWarning|ExperimentalWarning/.test(l)) emit({ type: 'error', text: short(l, 400) }); });
+     child.on('error', (e) => { emit({ type: 'error', text: `${cmd} failed to start: ${e.message}` }); });
+     child.on('close', (code) => {
+       signal?.removeEventListener('abort', onAbort);
+       if (code !== 0) st.ok = false;
+-      else if (!isClaude && st.ok === false && !err) st.ok = true;
++      else if (kind === 'codex' && st.ok === false && !err) st.ok = true;
+       noteDropped(st, drop, emit);
+       onEvent({ type: 'done', ok: st.ok, text: st.text, cost: st.cost });
+       resolve({ sessionId: st.sessionId, text: st.text, ok: st.ok, code, stderr: err.slice(-2000), lastError: st.lastError });
+diff --git a/app/server/env.ts b/app/server/env.ts
+index 5313ee6..18e0f01 100644
+--- a/app/server/env.ts
++++ b/app/server/env.ts
+@@ -1,6 +1,6 @@
+ // Loads optional settings/API keys from ~/.reelmimic/secrets.json (outside the repo, never committed) into process.env,
+ // so every agent and script the server launches sees them. Real environment variables win.
+-//   { "YATING_KEY": "...", "PIXABAY_KEY": "...", "FREESOUND_KEY": "...", "FFMPEG_DIR": "...", "CODEX_BIN": "...", "BUILDERS": "5" }
++//   { "YATING_KEY": "...", "PIXABAY_KEY": "...", "FREESOUND_KEY": "...", "FFMPEG_DIR": "...", "CODEX_BIN": "...", "OPENCODE_BIN": "...", "OPENCODE_MODEL": "...", "OPENCODE_AGENT": "build", "BUILDERS": "5" }
+ import { spawnSync } from 'node:child_process';
+ import { existsSync, readFileSync } from 'node:fs';
+ import { homedir } from 'node:os';
+diff --git a/app/server/index.ts b/app/server/index.ts
+index 9f52501..0981a62 100644
+--- a/app/server/index.ts
++++ b/app/server/index.ts
+@@ -39,7 +39,7 @@ app.post('/api/projects', upload.fields([{ name: 'reference', maxCount: 1 }, { n
+     for (const f of Object.values(files || {}).flat()) try { unlinkSync(f.path); } catch {}
+     return res.status(400).json({ error: `這看起來不像影片檔，請上傳影片格式（${J.REFERENCE_EXTS.join(' ')}）` });
+   }
+-  if (!['claude', 'codex'].includes(agent)) return res.status(400).json({ error: 'agent 必須是 claude 或 codex' });
++  if (!['claude', 'codex', 'opencode'].includes(agent)) return res.status(400).json({ error: 'agent 必須是 claude、codex 或 opencode' });
+   if (/�/.test(brief + (title || ''))) return res.status(400).json({ error: '需求文字編碼錯誤（請用 UTF-8 送出）' });
+   // optional review/fix round limits for this project (castRounds, chunkRounds, finalRounds: whole numbers 1–10)
+   let settings;
+diff --git a/app/shared/types.ts b/app/shared/types.ts
+index 5296c82..af65cfa 100644
+--- a/app/shared/types.ts
++++ b/app/shared/types.ts
+@@ -1,7 +1,7 @@
+ // Shapes shared by the server and the web app: job.json, the project snapshot, live events.
+ // Files written by agents (plan.json, reviews, critique…) follow CONTRACT.md; only the fields the app reads are typed here.
+ 
+-export type AgentKind = 'claude' | 'codex';
++export type AgentKind = 'claude' | 'codex' | 'opencode';
+ export type Lang = 'zh-TW' | 'en' | 'zh-CN';
+ 
+ export type Stage =
+@@ -210,4 +210,4 @@ export interface Snapshot {
+ // Server-Sent Events on /api/projects/:id/events
+ export type ServerEvent = { type: 'job'; stage: Stage } | { type: 'log'; ev: LogEvent };
+ 
+-export type AgentStatus = Record<AgentKind, string | null>;
++export type AgentStatus = Partial<Record<AgentKind, string | null>>;
+diff --git a/app/web/src/App.tsx b/app/web/src/App.tsx
+index bd73f5a..c6a2363 100644
+--- a/app/web/src/App.tsx
++++ b/app/web/src/App.tsx
+@@ -14,6 +14,7 @@ const useRoute = (): { page: 'project'; id: string } | { page: 'home'; id?: unde
+   const m = h.match(/^#\/p\/([\w-]+)/);
+   return m ? { page: 'project', id: m[1] } : { page: 'home' };
+ };
++const AGENT_LABEL: Record<AgentKind, string> = { claude: 'Claude Code', codex: 'Codex', opencode: 'OpenCode' };
+ const store = { get: (k: string) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k: string, v: string) => { try { localStorage.setItem(k, v); } catch {} } };
+ function useTheme(): [string, () => void] {
+   const sys = () => (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+@@ -35,6 +36,7 @@ export default function App() {
+         <button className="agents-cap" title="已連線的 AI 導演（點一下重新偵測）" disabled={agents === undefined} onClick={() => loadAgents(true)}>
+           <span><i className={`dot ${agents === undefined ? '' : agents?.claude ? 'on' : 'bad'}`} /><span className="lbl">Claude Code</span></span>
+           <span><i className={`dot ${agents === undefined ? '' : agents?.codex ? 'on' : 'bad'}`} /><span className="lbl">Codex</span></span>
++          <span><i className={`dot ${agents === undefined ? '' : agents?.opencode ? 'on' : 'bad'}`} /><span className="lbl">OpenCode</span></span>
+         </button>
+         <LangMenu />
+         <button className="icon-btn" onClick={toggle} aria-label="切換外觀"><I n={theme === 'dark' ? 'sun' : 'moon'} /></button>
+@@ -80,7 +82,7 @@ function Home({ agents }: { agents?: Partial<AgentStatus> }) {
+         <div className="plist">{list.map((p, i) => (
+           <a key={p.id} className="pcard fade-in" onMouseEnter={(e) => { const v = e.currentTarget.querySelector('video'); if (v) { v.currentTime = 3; v.play().catch(() => {}); } }} onMouseLeave={(e) => e.currentTarget.querySelector('video')?.pause()} style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }} href={`#/p/${p.id}`}>
+             <div className="th" style={{ backgroundImage: p.thumb ? `url("${api.file(p.id, p.thumb)}")` : undefined }}>{p.stage === 'done' && <video muted loop playsInline preload="none" src={api.file(p.id, 'out/video.mp4')} onError={(e) => e.currentTarget.remove()} />}<Status stage={p.stage} /></div>
+-            <div className="meta"><b>{p.title}</b><div className="small faint" style={{ marginTop: 2 }}>{p.agent === 'codex' ? 'Codex' : 'Claude Code'} · {ago(p.updatedAt)}{p.needs ? ` · ${p.needs} 項待你提供` : ''}</div></div>
++            <div className="meta"><b>{p.title}</b><div className="small faint" style={{ marginTop: 2 }}>{AGENT_LABEL[p.agent]} · {ago(p.updatedAt)}{p.needs ? ` · ${p.needs} 項待你提供` : ''}</div></div>
+           </a>))}</div>
+       </section>}
+     </main>
+@@ -100,7 +102,11 @@ function Composer({ agents }: { agents?: Partial<AgentStatus> }) {
+   const pick = useRef<HTMLInputElement>(null), assets = useRef<HTMLInputElement>(null);
+   const preview = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
+   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
+-  useEffect(() => { if (agents && !agents.claude && agents.codex) setAgent('codex'); }, [agents]);
++  useEffect(() => {
++    if (!agents) return;
++    if (!agents.claude && agents.codex) setAgent('codex');
++    else if (!agents.claude && !agents.codex && agents.opencode) setAgent('opencode');
++  }, [agents]);
+   const validUrl = /^https?:\/\//.test(url.trim());
+   const ok = (file || validUrl) && brief.trim() && !busy;
+   const setVideo = (f: File | null | undefined) => { if (f && f.type.startsWith('video/')) { setFile(f); setUrl(''); setLinkMode(false); setErr(''); } else if (f) setErr('請選擇影片檔（mp4 / mov / webm）'); };
+@@ -152,7 +158,8 @@ function Composer({ agents }: { agents?: Partial<AgentStatus> }) {
+           <span className="grow" />
+           <Seg value={agent} onChange={setAgent} options={[
+             { value: 'claude', label: <><span className="long">Claude Code</span><span className="short">Claude</span></>, disabled: agents && !agents.claude, title: agents?.claude || '未偵測到' },
+-            { value: 'codex', label: 'Codex', disabled: agents && !agents.codex, title: agents?.codex || '未偵測到' }]} />
++            { value: 'codex', label: 'Codex', disabled: agents && !agents.codex, title: agents?.codex || '未偵測到' },
++            { value: 'opencode', label: 'OpenCode', disabled: agents && !agents.opencode, title: agents?.opencode || '未偵測到' }]} />
+           <button className="send" disabled={!ok} onClick={submit} aria-label="開始">{busy ? <span className="spin-ring" /> : <I n="up" s={2.2} />}</button>
+         </div>
+         {inputs.length > 0 && <div className="small faint" style={{ padding: '8px 10px 2px' }}>素材：{inputs.map((f) => f.name).join('、')}</div>}
+diff --git a/app/web/src/Chat.tsx b/app/web/src/Chat.tsx
+index a98e802..b5e863d 100644
+--- a/app/web/src/Chat.tsx
++++ b/app/web/src/Chat.tsx
+@@ -5,6 +5,8 @@ import { I, Orb, Md, AutoText, Seg, useNow, dur, clock } from './ui.tsx';
+ import type { IconName } from './ui.tsx';
+ import type { MessageMeta, SnapshotView, Tag } from './types.ts';
+ 
++const AGENT_LABEL = { claude: 'Claude Code', codex: 'Codex', opencode: 'OpenCode' } as const;
++
+ // ---------- who is talking ----------
+ export const whoName = (w?: string) => {
+   if (!w || w === '_') return '系統';
+@@ -191,7 +193,7 @@ export function Conversation({ id, s, tag, setTag, onZoom }: { id: string; s: Sn
+     <aside className="convo">
+       <div className="convo-h">
+         <Orb size={30} live={working} idle={!working} />
+-        <div className="grow"><b>AI 導演</b><div className="sub">{job.agent === 'codex' ? 'Codex' : 'Claude Code'}{working && <><span>·</span><span className="dot live" />{live.length > 1 ? `${live.length} 個 agent 同時工作中` : '工作中'}</>}</div></div>
++        <div className="grow"><b>AI 導演</b><div className="sub">{AGENT_LABEL[job.agent]}{working && <><span>·</span><span className="dot live" />{live.length > 1 ? `${live.length} 個 agent 同時工作中` : '工作中'}</>}</div></div>
+         <Seg value={tab} onChange={setTab} options={[{ value: 'chat', label: '對話' }, { value: 'log', label: '紀錄' }]} />
+       </div>
+       {tab === 'log' ? <LogView id={id} job={job} /> : <>
+-- 
+2.54.0.windows.1
+

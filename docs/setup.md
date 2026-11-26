@@ -52,6 +52,36 @@ start.bat
 
 Open <http://localhost:4318>.
 
+## 2b. Optional: OpenCode director (DeepSeek V4.1 Flash)
+
+ReelMimic upstream only supports Claude Code and Codex. To use OpenCode:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1 -WithOpenCode
+```
+
+Or apply the patch manually:
+
+```powershell
+cd reelmimic
+git apply ../patches/reelmimic-opencode-agent.patch
+cd app
+npm run build
+```
+
+Restart the server. The header should show a green **OpenCode** pill, and the
+composer should offer **OpenCode**.
+
+Defaults:
+
+```text
+OPENCODE_MODEL=opencode-go/deepseek-v4.1-flash
+OPENCODE_AGENT=build
+```
+
+Override them in `~/.reelmimic/secrets.json` if needed. See
+[`opencode-adapter.md`](opencode-adapter.md).
+
 ## 3. Run the standalone voice demo
 
 Open `voice/demo/index.html` in Chrome and press **Play voice**.
@@ -111,6 +141,8 @@ Then re-render the frames.
 | `node render.mjs` can't find `puppeteer-core` | `cd voice/anime-demo && npm install` |
 | ReelMimic doctor fails | Install the missing item it names; see upstream `TROUBLESHOOTING.md` |
 | Port 4318 already used | Open <http://localhost:4318> — the server is already running |
+| OpenCode patch does not apply | Upstream changed; use `git apply -3 ../patches/reelmimic-opencode-agent.patch` and resolve conflicts |
+| OpenCode not shown in ReelMimic | Run `opencode --version`, then click the agent pill to re-check |
 
 ## File sizes
 
