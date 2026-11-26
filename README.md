@@ -2,6 +2,11 @@
 
 **A working prototype of an AI 2D animation agent: script → voice → lip-sync → animated MP4.**
 
+[![CI](https://github.com/Lianhahaha/Flick/actions/workflows/ci.yml/badge.svg)](https://github.com/Lianhahaha/Flick/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-7A6BFF)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)
+![Node](https://img.shields.io/badge/node-22.18%2B-339933)
+
 ![Hina walking and talking](demo/hina-walking-talking.jpg)
 
 This repo contains the voice, lip-sync, and anime-cel pieces we built while
