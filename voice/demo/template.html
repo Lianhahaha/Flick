@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hina — 2D Voice + Lip-Sync Demo</title>
+<style>
+  :root{
+    --ink:#2b2340;
+    --pink:#ff7aa8;
+    --blue:#5b57f0;
+    --cream:#fff7f0;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:ui-rounded,"Segoe UI",system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 700px at 20% 10%, #ffe3ef 0%, transparent 60%),
+      radial-gradient(1000px 700px at 85% 20%, #dfe4ff 0%, transparent 55%),
+      linear-gradient(160deg,#fffaf5 0%,#f4f1ff 55%,#eef7ff 100%);
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+  }
+  .shell{
+    width:min(1040px,94vw);
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:22px;
+    align-items:center;
+  }
+  @media (max-width:820px){
+    .shell{grid-template-columns:1fr;gap:10px}
+    .panel{order:2}
+  }
+  .stage{
+    position:relative;
+    aspect-ratio:900/650;
+    border-radius:28px;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 50% 28%, #ffffff 0%, #fff3f8 42%, #e9ecff 100%);
+    box-shadow:0 30px 70px rgba(70,50,120,.18), inset 0 0 0 1px rgba(255,255,255,.8);
+  }
+  .stage svg{width:100%;height:100%;display:block}
+  .badge{
+    position:absolute;top:16px;left:16px;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    background:rgba(255,255,255,.75);
+    border:1px solid rgba(90,70,140,.15);
+    padding:7px 11px;border-radius:999px;
+    backdrop-filter:blur(8px);
+    font-weight:700;color:#6b5a92;
+  }
+  .panel{
+    background:rgba(255,255,255,.72);
+    border:1px solid rgba(120,100,180,.14);
+    border-radius:28px;
+    padding:26px;
+    box-shadow:0 24px 60px rgba(70,50,120,.12);
+    backdrop-filter:blur(14px);
+  }
+  h1{font-size:clamp(26px,3vw,38px);line-height:1.05;margin:0 0 10px;letter-spacing:-.03em}
+  h1 span{color:var(--pink)}
+  .sub{font-size:14px;line-height:1.55;color:#6d6485;margin:0 0 18px}
+  .line{
+    font-size:15px;line-height:1.5;
+    background:#fff;border:1px solid #eee6ff;border-radius:16px;
+    padding:14px 15px;margin:0 0 16px;color:#3b3154;
+  }
+  .line b{color:var(--blue)}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  button{
+    appearance:none;border:0;cursor:pointer;
+    font:inherit;font-weight:800;
+    padding:13px 18px;border-radius:14px;
+    color:#fff;background:linear-gradient(135deg,#6c63ff,#ff6fa5);
+    box-shadow:0 12px 24px rgba(108,99,255,.28);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  button:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(108,99,255,.34)}
+  button:active{transform:translateY(0)}
+  button.ghost{
+    background:#fff;color:#5a4f7a;
+    box-shadow:inset 0 0 0 1px #e4dcff;
+  }
+  .meter{
+    display:flex;align-items:center;gap:10px;margin-top:16px;
+    font-size:12px;color:#7a7095;
+  }
+  .pulse{
+    width:9px;height:9px;border-radius:50%;background:#37d39b;
+    box-shadow:0 0 0 5px rgba(55,211,155,.15);
+  }
+  .pulse.off{background:#c9c2dd;box-shadow:0 0 0 5px rgba(201,194,221,.15)}
+  .shape{
+    margin-left:auto;font-family:ui-monospace,Consolas,monospace;
+    background:#f6f2ff;border-radius:8px;padding:4px 8px;color:#6b5a92;
+  }
+  .foot{
+    margin-top:18px;font-size:11px;line-height:1.5;color:#8b82a5;
+  }
+  .foot b{color:#5a4f7a}
+  .bob{animation:bob 4.8s ease-in-out infinite;transform-origin:450px 620px}
+  @keyframes bob{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-7px)}
+  }
+  .blink{animation:blink 4.4s infinite;transform-origin:450px 300px}
+  @keyframes blink{
+    0%,91%,100%{transform:scaleY(1)}
+    94%{transform:scaleY(.08)}
+  }
+  .sparkle{animation:sparkle 3.2s ease-in-out infinite}
+  @keyframes sparkle{
+    0%,100%{opacity:.35;transform:scale(.9)}
+    50%{opacity:1;transform:scale(1.1)}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="stage">
+    <div class="badge">Local 2D voice + lip-sync demo</div>
+    <svg viewBox="0 0 900 650" role="img" aria-label="Hina, a 2D anime character, speaking">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff9fc"/>
+          <stop offset=".55" stop-color="#f2f0ff"/>
+          <stop offset="1" stop-color="#e9f6ff"/>
+        </linearGradient>
+        <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#4a2a32"/>
+          <stop offset=".55" stop-color="#6b3b42"/>
+          <stop offset="1" stop-color="#3a2028"/>
+        </linearGradient>
+        <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffe9df"/>
+          <stop offset="1" stop-color="#ffd9cc"/>
+        </linearGradient>
+        <linearGradient id="uni" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#26365c"/>
+          <stop offset="1" stop-color="#1b2848"/>
+        </linearGradient>
+        <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="16"/>
+        </filter>
+      </defs>
+
+      <rect width="900" height="650" fill="url(#bg)"/>
+      <circle cx="150" cy="110" r="90" fill="#ffd7e6" opacity=".55" filter="url(#soft)"/>
+      <circle cx="760" cy="160" r="110" fill="#cfd8ff" opacity=".55" filter="url(#soft)"/>
+      <g fill="#fff" opacity=".7">
+        <circle class="sparkle" cx="760" cy="90" r="4"/>
+        <circle class="sparkle" cx="810" cy="130" r="3" style="animation-delay:-1.2s"/>
+        <circle class="sparkle" cx="120" cy="220" r="3" style="animation-delay:-2.1s"/>
+      </g>
+
+      <g class="bob">
+        <!-- shoulders / uniform -->
+        <path d="M300 650 C305 520 365 470 450 470 C535 470 595 520 600 650 Z" fill="url(#uni)"/>
+        <path d="M405 480 L450 560 L495 480 L475 470 L450 505 L425 470 Z" fill="#ffffff"/>
+        <path d="M450 505 L466 540 L450 575 L434 540 Z" fill="#ff6b8f"/>
+        <path d="M300 650 C305 520 365 470 450 470 L450 650 Z" fill="#ffffff" opacity=".06"/>
+
+        <!-- neck -->
+        <path d="M415 430 L415 480 Q450 500 485 480 L485 430 Z" fill="#ffd9cc"/>
+        <path d="M415 455 Q450 478 485 455 L485 480 Q450 500 415 480 Z" fill="#f6c4b4" opacity=".7"/>
+
+        <!-- back hair -->
+        <path d="M310 335 C292 205 360 120 450 120 C540 120 608 205 590 335 L590 500 C565 470 548 430 545 380 L535 300 L365 300 L355 380 C352 430 335 470 310 500 Z" fill="url(#hair)"/>
+
+        <!-- face -->
+        <ellipse cx="450" cy="325" rx="118" ry="142" fill="url(#skin)"/>
+        <ellipse cx="450" cy="338" rx="110" ry="128" fill="none" stroke="#f3bfae" stroke-width="2" opacity=".5"/>
+
+        <!-- ears -->
+        <ellipse cx="334" cy="330" rx="18" ry="28" fill="#ffd9cc"/>
+        <ellipse cx="566" cy="330" rx="18" ry="28" fill="#ffd9cc"/>
+
+        <!-- front hair -->
+        <path d="M322 330 C300 210 365 128 450 128 C535 128 600 210 578 330 C565 285 548 250 520 230 C500 282 470 300 450 302 C430 300 400 282 380 230 C352 250 335 285 322 330 Z" fill="url(#hair)"/>
+        <path d="M380 230 C400 282 430 300 450 302 C430 275 418 245 415 210 Z" fill="#2e1920" opacity=".55"/>
+        <path d="M520 230 C500 282 470 300 450 302 C470 275 482 245 485 210 Z" fill="#2e1920" opacity=".45"/>
+        <path d="M340 210 C370 160 410 145 450 145" fill="none" stroke="#8a5560" stroke-width="5" opacity=".45" stroke-linecap="round"/>
+
+        <!-- brows -->
+        <path d="M382 268 Q405 256 428 266" fill="none" stroke="#4a2a32" stroke-width="7" stroke-linecap="round"/>
+        <path d="M472 266 Q495 256 518 268" fill="none" stroke="#4a2a32" stroke-width="7" stroke-linecap="round"/>
+
+        <!-- eyes -->
+        <g class="blink">
+          <g>
+            <ellipse cx="405" cy="305" rx="27" ry="30" fill="#fff"/>
+            <ellipse cx="405" cy="308" rx="20" ry="24" fill="#6b4bd6"/>
+            <ellipse cx="405" cy="313" rx="13" ry="17" fill="#2b2050"/>
+            <circle cx="398" cy="298" r="7" fill="#fff"/>
+            <circle cx="412" cy="318" r="4" fill="#fff" opacity=".8"/>
+            <path d="M378 292 Q405 278 432 292" fill="none" stroke="#3a2028" stroke-width="6" stroke-linecap="round"/>
+          </g>
+          <g>
+            <ellipse cx="495" cy="305" rx="27" ry="30" fill="#fff"/>
+            <ellipse cx="495" cy="308" rx="20" ry="24" fill="#6b4bd6"/>
+            <ellipse cx="495" cy="313" rx="13" ry="17" fill="#2b2050"/>
+            <circle cx="488" cy="298" r="7" fill="#fff"/>
+            <circle cx="502" cy="318" r="4" fill="#fff" opacity=".8"/>
+            <path d="M468 292 Q495 278 522 292" fill="none" stroke="#3a2028" stroke-width="6" stroke-linecap="round"/>
+          </g>
+        </g>
+
+        <!-- blush -->
+        <ellipse cx="372" cy="352" rx="24" ry="10" fill="#ff9eb6" opacity=".45"/>
+        <ellipse cx="528" cy="352" rx="24" ry="10" fill="#ff9eb6" opacity=".45"/>
+        <path d="M360 350 l10 -4 M356 358 l10 -4" stroke="#ff7aa8" stroke-width="2" opacity=".5" stroke-linecap="round"/>
+        <path d="M520 350 l10 -4 M524 358 l10 -4" stroke="#ff7aa8" stroke-width="2" opacity=".5" stroke-linecap="round"/>
+
+        <!-- nose -->
+        <path d="M450 330 q4 10 -2 14" fill="none" stroke="#e8a995" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- mouth -->
+        <path id="mouth" d="M420 384 Q450 398 480 384" fill="none" stroke="#7a3042" stroke-width="5" stroke-linecap="round"/>
+
+        <!-- collar bow -->
+        <path d="M450 540 l-34 -18 8 34 z" fill="#ff6b8f"/>
+        <path d="M450 540 l34 -18 -8 34 z" fill="#ff6b8f"/>
+        <circle cx="450" cy="540" r="8" fill="#ffd1dd"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="panel">
+    <h1>Hina can <span>talk.</span></h1>
+    <p class="sub">This is a real 2D character driven by a local voice and a lip-sync track. No cloud, no API key.</p>
+
+    <p class="line"><b>Hina:</b> “Hi! I’m Hina. I can walk, talk, and act in a 2D cartoon. This voice is generated on your computer, and my mouth is synced with Rhubarb Lip Sync.”</p>
+
+    <div class="controls">
+      <button id="play">▶ Play voice</button>
+      <button id="stop" class="ghost">Stop</button>
+    </div>
+
+    <div class="meter">
+      <span id="dot" class="pulse off"></span>
+      <span id="status">Ready</span>
+      <span id="shape" class="shape">mouth: X</span>
+    </div>
+
+    <p class="foot">
+      <b>Piper TTS</b> (MIT) generates the voice locally. <b>Rhubarb Lip Sync</b> (MIT) turns the audio into
+      8 mouth shapes. This is the same voice + viseme pipeline wired into ReelMimic’s anime-cel engine.
+    </p>
+    <p class="foot">
+      <a href="../../demo/hina-walking-talking.mp4" style="color:#5b57f0;font-weight:800;text-decoration:none">▶ Watch the full 2D anime-cel clip (MP4)</a>
+    </p>
+  </div>
+</div>
+
+<audio id="audio" src="hina.wav" preload="auto"></audio>
+
+<script>
+  const cues = __CUES__;
+
+  const audio = document.getElementById('audio');
+  const play = document.getElementById('play');
+  const stop = document.getElementById('stop');
+  const dot = document.getElementById('dot');
+  const status = document.getElementById('status');
+  const shapeEl = document.getElementById('shape');
+  const mouth = document.getElementById('mouth');
+
+  // Rhubarb mouth shapes -> simple SVG mouth paths.
+  const SHAPES = {
+    X: { d: 'M420 384 Q450 398 480 384', fill: 'none', stroke: '#7a3042', sw: 5 },
+    A: { d: 'M424 386 Q450 400 476 386 Q450 392 424 386', fill: '#7a3042', stroke: '#7a3042', sw: 3 },
+    B: { d: 'M420 384 Q450 410 480 384 Q450 396 420 384', fill: '#7a3042', stroke: '#7a3042', sw: 3 },
+    C: { d: 'M416 382 Q450 424 484 382 Q450 402 416 382', fill: '#7a3042', stroke: '#7a3042', sw: 3 },
+    D: { d: 'M410 380 Q450 442 490 380 Q450 408 410 380', fill: '#7a3042', stroke: '#7a3042', sw: 3 },
+    E: { d: 'M430 384 Q450 418 470 384 Q450 398 430 384', fill: '#7a3042', stroke: '#7a3042', sw: 3 },
+    F: { d: 'M438 384 Q450 404 462 384 Q450 392 438 384', fill: '#7a3042', stroke: '#7a3042', sw: 3 },
+    G: { d: 'M414 382 Q450 424 486 382 L486 390 Q450 410 414 390 Z', fill: '#7a3042', stroke: '#7a3042', sw: 2 },
+    H: { d: 'M412 382 Q450 436 488 382 Q450 412 412 382', fill: '#7a3042', stroke: '#7a3042', sw: 3 }
+  };
+
+  function setMouth(value) {
+    const s = SHAPES[value] || SHAPES.X;
+    mouth.setAttribute('d', s.d);
+    mouth.setAttribute('fill', s.fill);
+    mouth.setAttribute('stroke', s.stroke);
+    mouth.setAttribute('stroke-width', s.sw);
+    shapeEl.textContent = 'mouth: ' + value;
+  }
+
+  let raf = null;
+  function tick() {
+    if (audio.paused) { setMouth('X'); return; }
+    const t = audio.currentTime;
+    let value = 'X';
+    for (let i = 0; i < cues.length; i++) {
+      if (t >= cues[i].start && t < cues[i].end) { value = cues[i].value; break; }
+    }
+    setMouth(value);
+    raf = requestAnimationFrame(tick);
+  }
+
+  play.addEventListener('click', () => {
+    audio.currentTime = 0;
+    audio.play().then(() => {
+      dot.classList.remove('off');
+      status.textContent = 'Speaking…';
+      if (raf) cancelAnimationFrame(raf);
+      tick();
+    }).catch(() => {
+      status.textContent = 'Click again to allow audio';
+    });
+  });
+
+  stop.addEventListener('click', () => {
+    audio.pause();
+    audio.currentTime = 0;
+    if (raf) cancelAnimationFrame(raf);
+    dot.classList.add('off');
+    status.textContent = 'Stopped';
+    setMouth('X');
+  });
+
+  audio.addEventListener('ended', () => {
+    dot.classList.add('off');
+    status.textContent = 'Finished';
+    setMouth('X');
+  });
+
+  setMouth('X');
+</script>
+</body>
+</html>
