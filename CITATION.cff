@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this demo in your work, please cite it as below."
+title: Flick
+abstract: "A working prototype of an AI 2D animation agent: local TTS, Rhubarb lip-sync, and a ReelMimic anime-cel scene."
+type: software
+authors:
+  - name: "Lianhahaha"
+repository-code: "https://github.com/Lianhahaha/Flick"
+url: "https://github.com/Lianhahaha/Flick"
+license: MIT
+version: 0.2.0
+date-released: 2026-11-26
+keywords:
+  - 2d-animation
+  - ai-agents
+  - text-to-speech
+  - lip-sync
+  - reelmimic
