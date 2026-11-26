@@ -2,6 +2,21 @@
 
 ## The pipeline
 
+```mermaid
+flowchart LR
+  A[Script / line] --> B[Piper TTS]
+  B --> C[voice.wav]
+  C --> D[Rhubarb Lip Sync]
+  D --> E[mouth.json · A-H]
+  E --> F[make_mouth.py]
+  F --> G[src/mouth.js]
+  G --> H[anime-cel scene]
+  H --> I[render.mjs]
+  I --> J[frames]
+  J --> K[FFmpeg]
+  K --> L[MP4]
+```
+
 ```text
 script / line
      │
