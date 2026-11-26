@@ -56,6 +56,7 @@ https://github.com/Lianhahaha/Flick
 ```text
 QUICKSTART.md                  the short version: run the demo in five minutes
 demo/
+  README.md                    what the demo shows
   hina-walking-talking.mp4     rendered 2D anime clip with voice
   hina-walking-talking.jpg     poster frame
 voice/
@@ -69,6 +70,8 @@ docs/
   roadmap.md                   what to build next
   licensing.md                 rights, licenses, and client-work notes
   opencode-adapter.md          run ReelMimic with DeepSeek via OpenCode
+  comparison.md                ReelMimic vs Toonflow vs HyperFrames/OpenMotion
+  faq.md                       common questions
 patches/
   reelmimic-opencode-agent.patch
 scripts/
