@@ -96,6 +96,16 @@ At a full-body wide shot, the mouth is only a few pixels. The demo walks in wide
 then cuts to a medium close-up for the dialogue. That is also how a real 2D
 production would shoot it.
 
+## Agent layer
+
+The voice demo and the rendered clip do not need an agent. The full ReelMimic
+app does: it sends a prompt to Claude Code, Codex, or OpenCode, and the agent
+writes files following `CONTRACT.md`.
+
+Upstream supports Claude Code and Codex. This repo adds OpenCode through a small
+patch, so a local model such as DeepSeek V4.1 Flash can act as the director. The
+voice pipeline itself is agent-agnostic.
+
 ## Integration points for the full agent
 
 1. **Screenplay schema** — add scenes, beats, dialogue lines, character IDs,
