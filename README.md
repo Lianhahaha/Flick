@@ -112,7 +112,7 @@ ReelMimic's Python/npm dependencies; do that with ReelMimic's `install.bat`.
 ```powershell
 git clone https://github.com/Lianhahaha/Flick.git
 cd Flick
-powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1
+powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1 -WithOpenCode
 cd reelmimic
 install.bat
 ```
