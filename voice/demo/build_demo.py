@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import base64
 import json
-import shutil
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -19,9 +18,7 @@ def main() -> None:
     html = template.replace("__CUES__", json.dumps(cues, separators=(",", ":")))
     html = html.replace('src="hina.wav"', f'src="{data_uri}"')
     (HERE / "index.html").write_text(html, encoding="utf-8")
-    shutil.copyfile(VOICE / "assets" / "hina.wav", HERE / "hina.wav")
     print(f"Wrote {HERE / 'index.html'} ({len(html):,} bytes, audio embedded)")
-    print(f"Copied {HERE / 'hina.wav'}")
 
 
 if __name__ == "__main__":
