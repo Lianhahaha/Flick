@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/assets/logo.svg" width="420" alt="Flick"></p>
+
 # Flick
 
 **A working prototype of an AI 2D animation agent: script → voice → lip-sync → animated MP4.**
