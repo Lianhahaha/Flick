@@ -29,8 +29,8 @@ Step "Python syntax" {
 }
 
 Step "Python tests" {
-  $pytest = Get-Command pytest -ErrorAction SilentlyContinue
-  if (-not $pytest) { Write-Host "  skip: pytest not installed (pip install -r requirements-dev.txt)"; return }
+  python -m pytest --version 2>$null | Out-Null
+  if ($LASTEXITCODE -ne 0) { Write-Host "  skip: pytest not installed (pip install -r requirements-dev.txt)"; return }
   python -m pytest -q
 }
 
