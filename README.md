@@ -201,6 +201,10 @@ npm run check
 
 Do not report vulnerabilities in a public issue. See [SECURITY.md](SECURITY.md).
 
+## Citation
+
+If you use Flick in a write-up, cite it via [CITATION.cff](CITATION.cff).
+
 ## License
 
 MIT for Flick's own code. Third-party components keep their own licenses; see
