@@ -23,6 +23,18 @@ and her mouth is driven by Rhubarb Lip Sync cues rather than a random lip flap.
 
 **New here?** Read [QUICKSTART.md](QUICKSTART.md) for the five-minute version.
 
+## Requirements
+
+| Requirement | Notes |
+|---|---|
+| Windows 10/11 | The bootstrap downloads Windows binaries; the core code is cross-platform |
+| Git | To clone this repo and the upstream projects |
+| Node.js 22.18+ | ReelMimic's app and the renderer |
+| Python 3.10+ | Analysis, voice, and mouth mapping |
+| FFmpeg + ffprobe | Encoding and media inspection |
+| Google Chrome | Headless frame rendering |
+| Claude Code, Codex, or OpenCode | Only for the full ReelMimic app; the demo video needs none |
+
 ## What works today
 
 | Piece | Status |
@@ -180,6 +192,17 @@ not yet have a screenplay schema, multi-character dialogue, a timeline editor,
 or ReelMimic's full production/review loop wired to the voice track.
 
 See [docs/roadmap.md](docs/roadmap.md) for the next milestones.
+
+## Documentation
+
+- [Quickstart](QUICKSTART.md)
+- [Architecture](docs/architecture.md)
+- [Setup](docs/setup.md)
+- [OpenCode adapter](docs/opencode-adapter.md)
+- [Comparison](docs/comparison.md)
+- [FAQ](docs/faq.md)
+- [Roadmap](docs/roadmap.md)
+- [Licensing](docs/licensing.md)
 
 ## Contributing
 
