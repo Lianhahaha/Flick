@@ -8,6 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-7A6BFF)](LICENSE)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)
 ![Node](https://img.shields.io/badge/node-22.18%2B-339933)
+![Status: prototype](https://img.shields.io/badge/status-prototype-F59E0B)
 
 ![Hina walking and talking](demo/hina-walking-talking.jpg)
 
