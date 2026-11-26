@@ -8,6 +8,8 @@
 /voice/bin/
 /voice/models/
 /voice/downloads/
+*.onnx
+*.onnx.json
 
 # Node / Vite
 node_modules/
@@ -20,8 +22,11 @@ out/check/
 out/*.mp4
 *.log
 .pytest_cache/
+.ruff_cache/
+.venv/
 __pycache__/
 *.pyc
+*.tmp
 
 # Secrets and local machine files
 secrets.json
