@@ -1,5 +1,13 @@
 # Quickstart
 
+First time? From the repo root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1 -WithOpenCode
+```
+
+That fetches ReelMimic, Piper, Rhubarb, and the voice model.
+
 ## 1. The rendered 2D anime clip
 
 Open [`demo/hina-walking-talking.mp4`](demo/hina-walking-talking.mp4).
@@ -62,8 +70,9 @@ start.bat
 
 Open <http://localhost:4318>.
 
-ReelMimic needs Claude Code or Codex. It uses your account's usage. A 30–60 s
-film takes roughly 1–3.5 hours.
+ReelMimic needs an agent runtime: Claude Code, Codex, or OpenCode (the patch in
+this repo adds OpenCode). It uses your account's usage. A 30–60 s film takes
+roughly 1–3.5 hours.
 
 ## 6. Toonflow reference
 
