@@ -108,8 +108,7 @@ The audio is embedded as a data URI, so no server is needed.
 ```powershell
 cd voice/anime-demo
 npm install
-node render.mjs --frames --workers=4
-node render.mjs --encode --out=out/video.mp4 --audio=assets/voice.wav
+npm run render
 ```
 
 Output: `voice/anime-demo/out/video.mp4`.

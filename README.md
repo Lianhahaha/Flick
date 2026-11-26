@@ -156,8 +156,7 @@ this works offline.
 ```powershell
 cd voice/anime-demo
 npm install
-node render.mjs --frames --workers=4
-node render.mjs --encode --out=out/video.mp4 --audio=assets/voice.wav
+npm run render
 ```
 
 ### 4. Generate a new voice line

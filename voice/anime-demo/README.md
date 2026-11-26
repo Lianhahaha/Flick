@@ -7,8 +7,7 @@ Piper voice and a Rhubarb lip-sync track.
 
 ```powershell
 npm install
-node render.mjs --frames --workers=4
-node render.mjs --encode --out=out/video.mp4 --audio=assets/voice.wav
+npm run render
 ```
 
 Output: `out/video.mp4` — 1920×1080, 24 fps, ~9.3 s, H.264 + AAC.
@@ -16,7 +15,7 @@ Output: `out/video.mp4` — 1920×1080, 24 fps, ~9.3 s, H.264 + AAC.
 For a quick preview sheet:
 
 ```powershell
-node render.mjs --sheet=0.5,1.5,2.5,3.5,4.5,5.5,6.5,8.2 --cols=4 --w=480 --out=out/check/sheet.jpg
+npm run sheet
 ```
 
 ## How the mouth works

@@ -35,8 +35,7 @@ Rebuild it:
 ```powershell
 cd voice/anime-demo
 npm install
-node render.mjs --frames --workers=4
-node render.mjs --encode --out=out/video.mp4 --audio=assets/voice.wav
+npm run render
 ```
 
 The scene is in `src/scenes/voice.js`. The mouth track is in `src/mouth.js`,
