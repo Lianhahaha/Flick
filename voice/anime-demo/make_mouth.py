@@ -3,30 +3,20 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 CUES = HERE.parent / "assets" / "hina.json"
-
-# Rhubarb A-H -> anime-cel mouth names (a i u e o n + expression mouths).
-MAP = {
-    "X": "n",
-    "A": "n",
-    "B": "a",
-    "C": "e",
-    "D": "a",
-    "E": "o",
-    "F": "u",
-    "G": "i",
-    "H": "a",
-}
+sys.path.insert(0, str(HERE.parent))
+from mouth_map import map_rhubarb  # noqa: E402  (path set above)
 
 
 def main() -> None:
     data = json.loads(CUES.read_text(encoding="utf-8"))
     cues = []
     for c in data["mouthCues"]:
-        cues.append([round(c["start"], 3), round(c["end"], 3), MAP.get(c["value"], "n")])
+        cues.append([round(c["start"], 3), round(c["end"], 3), map_rhubarb(c["value"])])
     body = json.dumps(cues, separators=(",", ":"))
     js = f"""// Generated from hina.json by make_mouth.py — Rhubarb A-H mapped to anime-cel mouths.
 window.MOUTH_CUES = {body};
