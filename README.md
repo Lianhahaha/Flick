@@ -21,6 +21,8 @@ https://github.com/Lianhahaha/Flick
 
 ---
 
+**New here?** Read [QUICKSTART.md](QUICKSTART.md) for the five-minute version.
+
 ## What works today
 
 | Piece | Status |
@@ -52,6 +54,7 @@ https://github.com/Lianhahaha/Flick
 ## Repository layout
 
 ```text
+QUICKSTART.md                  the short version: run the demo in five minutes
 demo/
   hina-walking-talking.mp4     rendered 2D anime clip with voice
   hina-walking-talking.jpg     poster frame

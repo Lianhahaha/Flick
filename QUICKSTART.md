@@ -1,4 +1,4 @@
-# Try these
+# Quickstart
 
 ## 1. The rendered 2D anime clip
 
