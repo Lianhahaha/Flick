@@ -203,6 +203,7 @@ See [docs/roadmap.md](docs/roadmap.md) for the next milestones.
 - [FAQ](docs/faq.md)
 - [Roadmap](docs/roadmap.md)
 - [Licensing](docs/licensing.md)
+- [Changelog](CHANGELOG.md)
 
 ## Contributing
 
