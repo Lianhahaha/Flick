@@ -64,6 +64,21 @@ scripts/
 third_party/                   redistributable license texts
 ```
 
+## Why the repo is small
+
+The repo contains only our code, docs, and the rendered demo. The other ~1 GB
+is third-party and machine-generated:
+
+- upstream source clones (ReelMimic, Toonflow, Piper, Rhubarb)
+- downloaded binaries and voice models
+- `node_modules`
+- rendered frames and caches
+
+Committing those would make every clone slow, duplicate upstream licenses, and
+put machine-specific binaries into Git. `scripts/bootstrap.ps1` fetches the
+exact upstream versions, so a collaborator gets the same working setup with two
+commands.
+
 ## Quick start
 
 ### 1. Bootstrap the upstream tools
@@ -75,6 +90,19 @@ powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1
 This clones ReelMimic and optionally Toonflow, then downloads the Piper and
 Rhubarb Windows binaries and the English voice model. It does not install
 ReelMimic's Python/npm dependencies; do that with ReelMimic's `install.bat`.
+
+### Collaborator setup (fresh clone)
+
+```powershell
+git clone https://github.com/Lianhahaha/Flick.git
+cd Flick
+powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1
+cd reelmimic
+install.bat
+```
+
+That gives the same setup as this machine: ReelMimic, Piper, Rhubarb, and the
+voice model. The demo video is already in the repo.
 
 ### 2. Try the standalone voice demo
 

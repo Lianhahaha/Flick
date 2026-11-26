@@ -3,6 +3,7 @@
 ## Prerequisites
 
 - Windows 10/11 (the demo was built on Windows)
+- Git
 - Node.js 22.18+ (26.x works; CI upstream tests 22.18/24)
 - Python 3.10+
 - FFmpeg + ffprobe on PATH
