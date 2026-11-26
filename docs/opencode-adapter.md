@@ -6,6 +6,8 @@ as a third agent, so the app can use a local OpenCode model such as
 
 Patch: [`../patches/reelmimic-opencode-agent.patch`](../patches/reelmimic-opencode-agent.patch)
 
+![ReelMimic with OpenCode](assets/reelmimic-opencode.png)
+
 ## What the patch changes
 
 | File | Change |
