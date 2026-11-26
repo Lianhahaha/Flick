@@ -1,0 +1,36 @@
+# Upstream repos cloned by scripts/bootstrap.ps1
+/reelmimic/
+/toonflow/
+/voice/piper/
+/voice/rhubarb-lip-sync/
+
+# Voice binaries, models, downloads (large, licensed separately)
+/voice/bin/
+/voice/models/
+/voice/downloads/
+
+# Node / Vite
+node_modules/
+dist/
+.vite/
+
+# Renders and caches
+out/frames/
+out/check/
+out/*.mp4
+*.log
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Secrets and local machine files
+secrets.json
+.env
+.env.*
+.claude/settings.local.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
