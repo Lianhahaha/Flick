@@ -48,6 +48,10 @@ Step "JSON files" {
   foreach ($f in $json) { Write-Host "  ok: $f" }
 }
 
+Step "Markdown links" {
+  python scripts/check_links.py
+}
+
 Step "PowerShell syntax" {
   $errors = $null
   [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $Root "scripts/bootstrap.ps1"), [ref]$null, [ref]$errors) | Out-Null

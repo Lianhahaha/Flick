@@ -26,6 +26,7 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m py_compile voice/mouth_map.py voice/tts_lipsync.py voice/demo/build_demo.py voice/anime-demo/make_mouth.py
       - run: python -m pytest -q
+      - run: python scripts/check_links.py
 
   node:
     name: Node
