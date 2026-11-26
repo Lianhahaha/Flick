@@ -181,6 +181,26 @@ or ReelMimic's full production/review loop wired to the voice track.
 
 See [docs/roadmap.md](docs/roadmap.md) for the next milestones.
 
+## Contributing
+
+Small, tested changes are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and
+run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/check.ps1
+```
+
+If you are changing the ReelMimic app, also run its checks:
+
+```powershell
+cd reelmimic/app
+npm run check
+```
+
+## Security
+
+Do not report vulnerabilities in a public issue. See [SECURITY.md](SECURITY.md).
+
 ## License
 
 MIT for Flick's own code. Third-party components keep their own licenses; see
