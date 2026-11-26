@@ -51,6 +51,15 @@ and her mouth is driven by Rhubarb Lip Sync cues rather than a random lip flap.
 | Full ReelMimic production integration | 🔜 Next |
 | Web editor / SaaS product | 🔜 Next |
 
+## OpenCode support
+
+![ReelMimic with OpenCode](docs/assets/reelmimic-opencode.png)
+
+ReelMimic upstream only lists Claude Code and Codex. This repo adds an
+**OpenCode** director, so the app can run on a local OpenCode model such as
+DeepSeek V4.1 Flash. Apply it with `scripts/bootstrap.ps1 -WithOpenCode`; see
+[docs/opencode-adapter.md](docs/opencode-adapter.md).
+
 ## Why this stack
 
 - **ReelMimic** is the only open-source project we found that renders real 2D
