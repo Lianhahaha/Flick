@@ -26,6 +26,21 @@ This will:
 
 It does **not** install ReelMimic's Python/npm dependencies.
 
+### macOS / Linux
+
+`scripts/bootstrap.ps1` downloads Windows binaries. On macOS/Linux:
+
+1. Install Piper and Rhubarb from their releases (or build them) and put both
+   executables on `PATH`.
+2. Download `en_US-lessac-medium.onnx` and `.onnx.json` from
+   [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices) into
+   `voice/models/`.
+3. Clone ReelMimic and run `./install.sh`, then `./start.sh`.
+4. The Python and Node checks are the same.
+
+The demo's renderer uses Chrome; set `CHROME_PATH` if it is not in a standard
+location.
+
 ## 2. Install ReelMimic
 
 ```powershell
