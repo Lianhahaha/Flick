@@ -11,6 +11,8 @@
 - [x] Standalone browser demo with embedded audio
 - [x] Windows launchers
 - [x] Bootstrap script for upstream clones and voice tools
+- [x] OpenCode director adapter (DeepSeek V4.1 Flash)
+- [x] Public repo docs, CI, templates, and checks
 
 ## Next: one 30–60 second dialogue scene
 
