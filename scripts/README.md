@@ -1,5 +1,16 @@
 # Scripts
 
+## `check.ps1`
+
+Local, network-free checks:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/check.ps1
+```
+
+It checks required files, Python syntax, Python tests, JavaScript syntax, JSON
+files, and the bootstrap script's PowerShell syntax.
+
 ## `bootstrap.ps1`
 
 Fetches the upstream repos and local voice tools.
