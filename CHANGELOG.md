@@ -24,12 +24,15 @@ All notable changes to Flick are documented here. The format follows
 - Quickstart renamed and updated for OpenCode/bootstrap
 - Removed a duplicate demo audio file
 - Roadmap updated with OpenCode and public-polish status
+- Anime demo has `npm run render` and `npm run sheet`
 
 ### Fixed
 
 - Render the full 10.1 s voice track instead of cutting the last 0.8 s
 - Keep the final subtitle visible through the last line
 - Remove an absolute local path from the Rhubarb metadata
+- Local check script now fails when a command fails
+- Link checker skips vendored/ignored directories
 
 ## [0.2.0] — 2026-11-26
 
