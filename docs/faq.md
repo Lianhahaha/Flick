@@ -35,6 +35,18 @@ V4.1 Flash. See [`opencode-adapter.md`](opencode-adapter.md).
 
 The voice demo and the rendered MP4 need no agent at all.
 
+## Which DeepSeek model should I use?
+
+If you use your own DeepSeek API key through OpenCode:
+
+- `deepseek/deepseek-flash` — faster and cheaper; good for iteration.
+- `deepseek/deepseek-v4-pro` — better at long code/planning turns; higher cost.
+
+Set `OPENCODE_MODEL` in `~/.reelmimic/secrets.json` and restart ReelMimic. The
+`OpenCode Go · max` label in the OpenCode UI means the OpenCode Go provider with
+the max variant, not a model called "DeepSeek Max". See
+[`opencode-adapter.md`](opencode-adapter.md).
+
 ## Why is the repo only ~5.6 MB?
 
 Because it contains source, docs, and the demo — not the 1 GB of upstream clones,

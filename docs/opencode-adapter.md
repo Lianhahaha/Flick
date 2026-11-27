@@ -2,7 +2,7 @@
 
 ReelMimic upstream only spawns `claude` or `codex`. This patch adds **OpenCode**
 as a third agent, so the app can use a local OpenCode model such as
-**DeepSeek V4.1 Flash** (`opencode-go/deepseek-v4.1-flash`).
+**DeepSeek V4.1 Flash** or **DeepSeek V4 Pro**.
 
 Patch: [`../patches/reelmimic-opencode-agent.patch`](../patches/reelmimic-opencode-agent.patch)
 
@@ -67,12 +67,43 @@ Put overrides in `~/.reelmimic/secrets.json` or the environment:
 }
 ```
 
-Make sure OpenCode itself is authenticated and the model works:
+### Use your own DeepSeek API key
+
+`opencode-go/...` is OpenCode Go's hosted provider. To use your own DeepSeek
+API key instead:
 
 ```powershell
-opencode models
-opencode run "Reply with exactly: ok" --format json --model opencode-go/deepseek-v4.1-flash --auto --agent build
+opencode auth list
 ```
+
+You should see `DeepSeek API key stored`. Then pick a model:
+
+| Model | Best for | Notes |
+|---|---|---|
+| `deepseek/deepseek-flash` | Faster and cheaper | Good for iteration and long productions |
+| `deepseek/deepseek-v4-pro` | Better code/planning quality | Higher cost per turn; can be slower |
+
+Set it in `~/.reelmimic/secrets.json`:
+
+```json
+{
+  "OPENCODE_MODEL": "deepseek/deepseek-v4-pro",
+  "OPENCODE_AGENT": "build"
+}
+```
+
+Then restart ReelMimic. The adapter passes `--model` to OpenCode, so the
+provider and API key are resolved by OpenCode, not ReelMimic.
+
+Test the exact model before a production:
+
+```powershell
+opencode run "Reply with exactly: ok" --format json --model deepseek/deepseek-v4-pro --auto --agent build
+```
+
+The OpenCode UI label `OpenCode Go · max` means **OpenCode Go provider, max
+variant**. It is not a separate "DeepSeek Max" model. The adapter does not add a
+`#max` variant; set one explicitly only if your provider supports it.
 
 ## Verify in ReelMimic
 
