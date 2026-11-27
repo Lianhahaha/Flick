@@ -71,6 +71,8 @@ endpoint (DeepSeek, OpenAI, OpenRouter, vLLM, LM Studio). The key is stored in
 You can also set `OPENCODE_MODEL` directly to `deepseek/deepseek-v4-pro`
 (better) or `deepseek/deepseek-flash` (faster/cheaper).
 
+Project chat supports `/help`, `/status`, `/model`, and `/key`.
+
 ## Why this stack
 
 - **ReelMimic** is the only open-source project we found that renders real 2D

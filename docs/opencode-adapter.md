@@ -95,9 +95,19 @@ Examples:
 
 Click **Remove** to go back to `OPENCODE_MODEL`.
 
-ReelMimic's chat is headless: OpenCode's interactive slash menu (typing `/`)
-is not available inside an `opencode run` turn. Custom commands can be defined
-in OpenCode's config, but ReelMimic does not parse slash commands yet.
+ReelMimic's chat is headless: OpenCode's interactive slash **menu** (typing `/`)
+is not available inside an `opencode run` turn. ReelMimic handles these commands
+itself in the project chat:
+
+| Command | Result |
+|---|---|
+| `/help` | List commands |
+| `/status` | Current stage and agent |
+| `/model` | Current custom/default model |
+| `/key` | Where to set the API key |
+
+Any other slash command is sent to the director as a normal prompt, so custom
+OpenCode commands can still be used if configured.
 
 ### Use your own DeepSeek API key directly
 
