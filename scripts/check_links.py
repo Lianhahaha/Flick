@@ -9,12 +9,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LINK = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 SKIP = ("http://", "https://", "mailto:", "#")
+SKIP_DIRS = {".git", "node_modules", "bin", "models", "downloads", "out", "__pycache__"}
 
 
 def main() -> int:
     bad: list[str] = []
     for md in sorted(ROOT.rglob("*.md")):
-        if ".git" in md.parts:
+        if any(part in SKIP_DIRS for part in md.parts):
             continue
         text = md.read_text(encoding="utf-8")
         for raw in LINK.findall(text):
