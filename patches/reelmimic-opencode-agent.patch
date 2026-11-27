@@ -1,7 +1,7 @@
 From aaa7677934639f5cb8d0a2ff302b51df78985f5e Mon Sep 17 00:00:00 2001
 From: Lianhahaha <itsmecalcheese@gmail.com>
 Date: Thu, 26 Nov 2026 21:02:03 +0800
-Subject: [PATCH 1/5] feat: add OpenCode agent adapter
+Subject: [PATCH 1/9] feat: add OpenCode agent adapter
 
 ---
  app/server/agents/index.test.ts | 29 +++++++++++++++++---
@@ -289,7 +289,7 @@ index a98e802..b5e863d 100644
 From 9940eb2edf0502f07158a7368f3a825fe12f844a Mon Sep 17 00:00:00 2001
 From: Lianhahaha <itsmecalcheese@gmail.com>
 Date: Fri, 27 Nov 2026 09:56:00 +0800
-Subject: [PATCH 2/5] feat(server): add custom API profile storage
+Subject: [PATCH 2/9] feat(server): add custom API profile storage
 
 ---
  .gitignore               |   1 +
@@ -494,7 +494,7 @@ index af65cfa..3bdd84c 100644
 From 755ed832fca9f20d7b28461b2b650d264fcab448 Mon Sep 17 00:00:00 2001
 From: Lianhahaha <itsmecalcheese@gmail.com>
 Date: Fri, 27 Nov 2026 09:56:01 +0800
-Subject: [PATCH 3/5] feat(opencode): route custom API profile
+Subject: [PATCH 3/9] feat(opencode): route custom API profile
 
 ---
  app/server/agents/index.ts | 4 +++-
@@ -522,7 +522,7 @@ index dc648b0..ceb1a6c 100644
 From 2745473efd69d2844d37cc8192b291e06749b8e1 Mon Sep 17 00:00:00 2001
 From: Lianhahaha <itsmecalcheese@gmail.com>
 Date: Fri, 27 Nov 2026 09:56:01 +0800
-Subject: [PATCH 4/5] feat(web): add API key control for OpenCode
+Subject: [PATCH 4/9] feat(web): add API key control for OpenCode
 
 ---
  app/web/src/App.tsx    | 34 +++++++++++++++++++++++++++++++++-
@@ -660,7 +660,7 @@ index 25988da..f8584d7 100644
 From 311a6350ffe3fb5a6be9678e12ae1523c219a649 Mon Sep 17 00:00:00 2001
 From: Lianhahaha <itsmecalcheese@gmail.com>
 Date: Fri, 27 Nov 2026 10:45:22 +0800
-Subject: [PATCH 5/5] feat(chat): add slash commands for model and status
+Subject: [PATCH 5/9] feat(chat): add slash commands for model and status
 
 ---
  app/server/index.ts | 29 ++++++++++++++++++++++++++++-
@@ -713,6 +713,203 @@ index 9ceec1e..7321249 100644
  // Approve: blocked (409) while a required input is open — production never starts without it.
  app.post('/api/projects/:id/approve', (req, res) => {
    const { id } = req.params; if (!guard(res, id)) return;
+-- 
+2.54.0.windows.1
+
+
+From fc418d5455b783fd12571503baeca2388a146040 Mon Sep 17 00:00:00 2001
+From: Lianhahaha <itsmecalcheese@gmail.com>
+Date: Fri, 27 Nov 2026 12:08:52 +0800
+Subject: [PATCH 6/9] fix(web): harden custom API panel
+
+---
+ app/web/src/App.tsx | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/app/web/src/App.tsx b/app/web/src/App.tsx
+index 11e28ea..eb44714 100644
+--- a/app/web/src/App.tsx
++++ b/app/web/src/App.tsx
+@@ -111,6 +111,7 @@ function Composer({ agents }: { agents?: Partial<AgentStatus> }) {
+     if (!agents.claude && agents.codex) setAgent('codex');
+     else if (!agents.claude && !agents.codex && agents.opencode) setAgent('opencode');
+   }, [agents]);
++  useEffect(() => { if (agent !== 'opencode') setCustomOpen(false); }, [agent]);
+   const validUrl = /^https?:\/\//.test(url.trim());
+   const ok = (file || validUrl) && brief.trim() && !busy;
+   const setVideo = (f: File | null | undefined) => { if (f && f.type.startsWith('video/')) { setFile(f); setUrl(''); setLinkMode(false); setErr(''); } else if (f) setErr('請選擇影片檔（mp4 / mov / webm）'); };
+@@ -124,9 +125,12 @@ function Composer({ agents }: { agents?: Partial<AgentStatus> }) {
+     try { const { id } = await api.create(f); location.hash = `#/p/${id}`; } catch (e) { setErr((e as Error).message); setBusy(false); }
+   };
+   const saveCustom = async () => {
+-    setCustomBusy(true); setCustomErr('');
++    setCustomErr('');
++    if (!customKey.trim() && !custom?.keySet) { setCustomErr('API key is required'); return; }
++    if (!/^https?:\/\//i.test(customBase.trim())) { setCustomErr('Base URL must start with http:// or https://'); return; }
++    setCustomBusy(true);
+     try {
+-      const s = await api.saveCustomApi({ apiKey: customKey, baseUrl: customBase, model: customModel });
++      const s = await api.saveCustomApi({ apiKey: customKey, baseUrl: customBase.trim(), model: customModel.trim() });
+       setCustom(s); setCustomKey(''); setCustomOpen(false);
+     } catch (e) { setCustomErr((e as Error).message); }
+     finally { setCustomBusy(false); }
+@@ -169,11 +173,11 @@ function Composer({ agents }: { agents?: Partial<AgentStatus> }) {
+           <button className={`tool-chip ${inputs.length ? 'on' : ''}`} onClick={() => assets.current!.click()} title="配樂、歌詞、圖片、Logo、自家角色設計圖">
+             <I n="clip" />素材{inputs.length > 0 && <span className="n">{inputs.length}</span>}</button>
+           <input ref={assets} type="file" multiple hidden onChange={(e) => { setInputs([...e.target.files!]); e.target.value = ''; }} />
+-          <button className={`tool-chip ${quality !== DEFAULT_QUALITY ? 'on' : ''}`} onClick={() => { setQualityOpen(!qualityOpen); setRoundsOpen(false); }} aria-expanded={qualityOpen} title="品質越高，檢查越細、時間越長">
++          <button className={`tool-chip ${quality !== DEFAULT_QUALITY ? 'on' : ''}`} onClick={() => { setQualityOpen(!qualityOpen); setRoundsOpen(false); setCustomOpen(false); }} aria-expanded={qualityOpen} title="品質越高，檢查越細、時間越長">
+             <I n="spark" />{QUALITY_INFO[quality].label}</button>
+-          {defaults && <button className={`tool-chip ${customRounds.length ? 'on' : ''}`} onClick={() => { setRoundsOpen(!roundsOpen); setQualityOpen(false); }} aria-expanded={roundsOpen} title="每一關最多審查、修改幾輪">
++          {defaults && <button className={`tool-chip ${customRounds.length ? 'on' : ''}`} onClick={() => { setRoundsOpen(!roundsOpen); setQualityOpen(false); setCustomOpen(false); }} aria-expanded={roundsOpen} title="每一關最多審查、修改幾輪">
+             <I n="sliders" /><span className="lbl-wide">審查輪數</span>{customRounds.length > 0 && <span className="n">{customRounds.length}</span>}</button>}
+-          {agent === 'opencode' && <button className={`tool-chip ${custom?.configured ? 'on' : ''}`} onClick={() => { setCustomOpen(!customOpen); setQualityOpen(false); setRoundsOpen(false); }} aria-expanded={customOpen} title="Use your own OpenAI-compatible API key">
++          {agent === 'opencode' && <button className={`tool-chip ${custom?.configured ? 'on' : ''}`} onClick={() => { setCustomOpen(!customOpen); setQualityOpen(false); setRoundsOpen(false); }} aria-expanded={customOpen} aria-label="API key settings" title={custom?.configured ? `Custom API: ${custom.model}` : 'Use your own OpenAI-compatible API key'}>
+             <I n="key" /><span className="lbl-wide">API key</span>{custom?.configured && <span className="n">✓</span>}</button>}
+           <span className="grow" />
+           <Seg value={agent} onChange={setAgent} options={[
+@@ -186,16 +190,16 @@ function Composer({ agents }: { agents?: Partial<AgentStatus> }) {
+         {qualityOpen && <div className="comp-rounds fade-in"><QualityPicker value={quality} onChange={(q) => { setQuality(q); setQualityOpen(false); }} /><div className="tiny faint" style={{ padding: '6px 2px 0' }}>時間以 30 秒的片、核准企劃後計算；做到一半或做完都可以再換（做完升級會從這支片接著修）。</div></div>}
+         {roundsOpen && defaults && <div className="comp-rounds fade-in"><RoundsEditor value={rounds} defaults={defaults} onChange={setRounds} pauses={preset?.pauseAtLimit !== false} /></div>}
+         {customOpen && <div className="comp-rounds api-form fade-in">
+-          <div className="small faint">Use your own OpenAI-compatible API for the OpenCode director. The key is stored in <code>~/.reelmimic/secrets.json</code>, not in the project.</div>
+-          <input type="password" autoComplete="off" placeholder={custom?.keySet ? 'Leave blank to keep the saved key' : 'API key'} value={customKey} onChange={(e) => setCustomKey(e.target.value)} />
+-          <input placeholder="Base URL, e.g. https://api.deepseek.com/v1" value={customBase} onChange={(e) => setCustomBase(e.target.value)} />
+-          <input placeholder="Model ID, e.g. deepseek-chat" value={customModel} onChange={(e) => setCustomModel(e.target.value)} />
++          <div className="small muted">Use your own OpenAI-compatible API for the OpenCode director. The key is stored in <code>~/.reelmimic/secrets.json</code>, not in the project.</div>
++          <input type="password" autoComplete="off" spellCheck={false} aria-label="API key" placeholder={custom?.keySet ? 'Leave blank to keep the saved key' : 'API key'} value={customKey} onChange={(e) => setCustomKey(e.target.value)} />
++          <input inputMode="url" autoComplete="off" spellCheck={false} aria-label="Base URL" placeholder="Base URL, e.g. https://api.deepseek.com/v1" value={customBase} onChange={(e) => setCustomBase(e.target.value)} />
++          <input autoComplete="off" spellCheck={false} aria-label="Model ID" placeholder="Model ID, e.g. deepseek-chat" value={customModel} onChange={(e) => setCustomModel(e.target.value)} />
+           <div className="api-actions">
+             <button className="btn sm" disabled={customBusy || !customBase.trim() || !customModel.trim()} onClick={saveCustom}>{customBusy ? 'Saving…' : 'Save'}</button>
+             <button className="btn sm ghost" disabled={customBusy || !custom?.configured} onClick={clearCustom}>Remove</button>
+-            <span className="small faint">{custom?.configured ? 'Custom API active' : 'OpenCode default'}</span>
++            <span className="small muted" aria-live="polite">{custom?.configured ? 'Custom API active' : 'OpenCode default'}</span>
+           </div>
+-          {customErr && <div className="small" style={{ color: 'var(--red)' }}>{customErr}</div>}
++          {customErr && <div className="small" role="alert" style={{ color: 'var(--red)' }}>{customErr}</div>}
+         </div>}
+       </div>
+       {err ? <div className="small" style={{ color: 'var(--red)', textAlign: 'center', marginTop: 12 }}>{err}</div>
+-- 
+2.54.0.windows.1
+
+
+From c357627b76d1102092749bc07bbb125b4a444f4d Mon Sep 17 00:00:00 2001
+From: Lianhahaha <itsmecalcheese@gmail.com>
+Date: Fri, 27 Nov 2026 12:08:52 +0800
+Subject: [PATCH 7/9] fix(web): wrap composer controls on mobile
+
+---
+ app/web/src/styles.css | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/app/web/src/styles.css b/app/web/src/styles.css
+index c44aeb6..80ea216 100644
+--- a/app/web/src/styles.css
++++ b/app/web/src/styles.css
+@@ -497,12 +497,13 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: -.022e
+   .hero p { font-size: 15.5px; }
+   .ref-empty { padding: 12px; gap: 12px; }
+   .ref-empty .small { display: none; }
+-  .comp-bar { flex-wrap: nowrap; }
++  .comp-bar { flex-wrap: wrap; gap: 4px 2px; }
++  .comp-bar .seg { order: 10; flex: 1 1 100%; margin-top: 2px; }
++  .comp-bar .seg button:disabled { display: none; }
+   .seg button { padding: 0 9px; font-size: 12.5px; }
+   .seg .long { display: none; }
+   .tool-chip { padding: 0 8px; gap: 4px; }
+   .comp-bar .lbl-wide { display: none; }
+-  .comp-bar { gap: 2px; }
+   .card { padding: 18px 16px; border-radius: 20px; }
+   .livebar .small { display: none; }
+   .p-head h1 { font-size: 26px; }
+-- 
+2.54.0.windows.1
+
+
+From 82a5b3dfde9e324c68c3d2bc58106f1001b71145 Mon Sep 17 00:00:00 2001
+From: Lianhahaha <itsmecalcheese@gmail.com>
+Date: Fri, 27 Nov 2026 12:08:52 +0800
+Subject: [PATCH 8/9] feat(chat): show /help hint for OpenCode
+
+---
+ app/web/src/Chat.tsx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/app/web/src/Chat.tsx b/app/web/src/Chat.tsx
+index b5e863d..89dbfcb 100644
+--- a/app/web/src/Chat.tsx
++++ b/app/web/src/Chat.tsx
+@@ -188,7 +188,7 @@ export function Conversation({ id, s, tag, setTag, onZoom }: { id: string; s: Sn
+     } catch (e) { setErr((e as Error).message); }
+     inFlight.current = false; setSending(false);
+   };
+-  const hint = job.stage === 'plan_review' ? '對企劃提意見，例如：S3 的轉場想更誇張…' : job.stage === 'done' ? '對成片提意見，例如：12 秒那裡太快看不懂…' : job.stage === 'needs_input' ? '告訴導演怎麼處理，或補充說明…' : job.stage === 'error' ? '說明要怎麼處理這個問題…' : ['new', 'analyzing', 'styling', 'styled', 'planning', 'replanning'].includes(job.stage) ? '企劃還在寫，可以先補充想法，導演會一併放進企劃…' : 'AI 工作中，這一輪完成後就可以說話';
++  const hint = (job.stage === 'plan_review' ? '對企劃提意見，例如：S3 的轉場想更誇張…' : job.stage === 'done' ? '對成片提意見，例如：12 秒那裡太快看不懂…' : job.stage === 'needs_input' ? '告訴導演怎麼處理，或補充說明…' : job.stage === 'error' ? '說明要怎麼處理這個問題…' : ['new', 'analyzing', 'styling', 'styled', 'planning', 'replanning'].includes(job.stage) ? '企劃還在寫，可以先補充想法，導演會一併放進企劃…' : 'AI 工作中，這一輪完成後就可以說話') + (job.agent === 'opencode' ? ' · /help' : '');
+   return (
+     <aside className="convo">
+       <div className="convo-h">
+-- 
+2.54.0.windows.1
+
+
+From 37251da22bf4366e3bcbd8681f2f2c58a1e0807d Mon Sep 17 00:00:00 2001
+From: Lianhahaha <itsmecalcheese@gmail.com>
+Date: Fri, 27 Nov 2026 12:08:53 +0800
+Subject: [PATCH 9/9] fix(server): localize slash command replies
+
+---
+ app/server/index.ts | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/app/server/index.ts b/app/server/index.ts
+index 7321249..1d6caba 100644
+--- a/app/server/index.ts
++++ b/app/server/index.ts
+@@ -7,7 +7,7 @@ import { existsSync, mkdirSync, renameSync, unlinkSync } from 'node:fs';
+ import { join, extname, resolve, sep } from 'node:path';
+ import { createAgentCache } from './agents-cache.ts';
+ import { clearCustomApi, customApiStatus, saveCustomApi, syncCustomConfig } from './custom-api.ts';
+-import { chat } from './store.ts';
++import { L, chat } from './store.ts';
+ import * as J from './jobs.ts';
+ // Ctrl+C / kill: stop the agents first (the next start marks their turns interrupted, and Retry resumes them)
+ for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { J.stopAll(); setTimeout(() => process.exit(0), 800); });
+@@ -99,22 +99,28 @@ app.post('/api/projects/:id/message', (req, res) => {
+   if (text.startsWith('/') && guard(res, req.params.id)) {
+     const s = customApiStatus();
+     if (text === '/help' || text === '/?') {
+-      chat(req.params.id, 'system', 'Commands: /help · /status · /model · /key. Everything else is sent to the director.');
++      chat(req.params.id, 'system', L(req.params.id,
++        '指令：/help | /status | /model | /key。其他訊息會送給導演。',
++        'Commands: /help | /status | /model | /key. Everything else is sent to the director.'));
+       return res.json({ ok: true });
+     }
+     if (text === '/status') {
+       const j = J.load(req.params.id);
+-      chat(req.params.id, 'system', `Stage: ${j.stage} · Agent: ${j.agent}`);
++      chat(req.params.id, 'system', L(req.params.id,
++        `階段：${j.stage} | AI：${j.agent}`,
++        `Stage: ${j.stage} | Agent: ${j.agent}`));
+       return res.json({ ok: true });
+     }
+     if (text === '/model') {
+       chat(req.params.id, 'system', s.configured
+-        ? `Custom API: ${s.model} @ ${s.baseUrl}`
+-        : `OpenCode default: ${process.env.OPENCODE_MODEL || 'opencode-go/deepseek-v4.1-flash'}`);
++        ? L(req.params.id, `自訂 API：${s.model} @ ${s.baseUrl}`, `Custom API: ${s.model} @ ${s.baseUrl}`)
++        : L(req.params.id, `OpenCode 預設：${process.env.OPENCODE_MODEL || 'opencode-go/deepseek-v4.1-flash'}`, `OpenCode default: ${process.env.OPENCODE_MODEL || 'opencode-go/deepseek-v4.1-flash'}`));
+       return res.json({ ok: true });
+     }
+     if (text === '/key') {
+-      chat(req.params.id, 'system', 'Use the API key button on the home composer while OpenCode is selected.');
++      chat(req.params.id, 'system', L(req.params.id,
++        '在首頁選擇 OpenCode 後，按「API key」按鈕設定。',
++        'Use the API key button on the home composer while OpenCode is selected.'));
+       return res.json({ ok: true });
+     }
+   }
 -- 
 2.54.0.windows.1
 
