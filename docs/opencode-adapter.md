@@ -50,7 +50,7 @@ Then restart the server.
 
 ## Configure
 
-The defaults are already set for this machine:
+Code defaults (override them in `~/.reelmimic/secrets.json`):
 
 | Variable | Default | Meaning |
 |---|---|---|
