@@ -94,7 +94,14 @@ OPENCODE_MODEL=opencode-go/deepseek-v4.1-flash
 OPENCODE_AGENT=build
 ```
 
-Override them in `~/.reelmimic/secrets.json` if needed. See
+Use your own DeepSeek API key by setting one of:
+
+```text
+deepseek/deepseek-flash     # faster / cheaper
+deepseek/deepseek-v4-pro    # better code and planning
+```
+
+in `~/.reelmimic/secrets.json`, then restart ReelMimic. See
 [`opencode-adapter.md`](opencode-adapter.md).
 
 ## 3. Run the standalone voice demo
