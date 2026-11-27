@@ -73,7 +73,7 @@
     };
     line(.2, 3.0, "Hi! I'm Hina.");
     line(3.2, 6.3, "I can walk, talk, and act in a 2D cartoon.");
-    line(6.5, 8.9, "This voice is local, and my mouth is synced.");
+    line(6.5, 10.0, "My voice is local. My mouth is synced with Rhubarb Lip Sync.");
   };
-  window.EXTRA_FONTS.push(['800 54px "M PLUS Rounded 1c"', "Hi! I'm Hina. I can walk, talk, and act in a 2D cartoon. This voice is local, and my mouth is synced."]);
+  window.EXTRA_FONTS.push(['800 54px "M PLUS Rounded 1c"', "Hi! I'm Hina. I can walk, talk, and act in a 2D cartoon. My voice is local. My mouth is synced with Rhubarb Lip Sync."]);
 })();
