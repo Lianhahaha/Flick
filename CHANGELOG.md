@@ -4,6 +4,16 @@ All notable changes to Flick are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.2] - 2026-11-27
+
+### Fixed
+
+- Custom API panel closes when switching agents or opening quality/rounds
+- API key panel validates the key and URL locally before sending
+- Composer controls wrap on mobile; the agent picker gets its own row
+- `/help` hint appears in the OpenCode chat placeholder
+- Slash-command replies follow the project language
+
 ## [0.3.1] - 2026-11-27
 
 ### Added
