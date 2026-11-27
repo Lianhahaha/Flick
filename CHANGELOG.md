@@ -4,6 +4,15 @@ All notable changes to Flick are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-11-27
+
+### Added
+
+- API key button for any OpenAI-compatible endpoint
+- Custom provider config generated in `.opencode/opencode.json`
+- Server-side API key storage in `~/.reelmimic/secrets.json` (never in a project)
+- Direct DeepSeek model documentation and balance-error guidance
+
 ## [0.2.0] - 2026-11-26
 
 ### Added
@@ -20,9 +29,6 @@ All notable changes to Flick are documented here. The format follows
 - OpenCode director adapter patch for ReelMimic
 - `OPENCODE_MODEL`, `OPENCODE_AGENT`, and `OPENCODE_BIN` configuration
 - OpenCode option in the ReelMimic composer and header
-- API key button for any OpenAI-compatible endpoint
-- Custom provider config generated in `.opencode/opencode.json`
-- Server-side API key storage in `~/.reelmimic/secrets.json` (never in a project)
 - Bootstrap `-WithOpenCode` flag
 - Architecture, setup, licensing, roadmap, and OpenCode adapter docs
 
