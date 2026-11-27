@@ -7,7 +7,14 @@ Set-Location $Root
 $failed = 0
 function Step([string]$Name, [scriptblock]$Body) {
   Write-Host "`n== $Name" -ForegroundColor Cyan
-  try { & $Body } catch { Write-Host "  FAIL: $($_.Exception.Message)" -ForegroundColor Red; $script:failed++ }
+  $global:LASTEXITCODE = 0
+  try {
+    & $Body
+    if ($LASTEXITCODE -ne 0) { throw "command failed (exit $LASTEXITCODE)" }
+  } catch {
+    Write-Host "  FAIL: $($_.Exception.Message)" -ForegroundColor Red
+    $script:failed++
+  }
 }
 
 Step "Required files" {
@@ -30,14 +37,20 @@ Step "Python syntax" {
 
 Step "Python tests" {
   python -m pytest --version 2>$null | Out-Null
-  if ($LASTEXITCODE -ne 0) { Write-Host "  skip: pytest not installed (pip install -r requirements-dev.txt)"; return }
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "  skip: pytest not installed (pip install -r requirements-dev.txt)"
+    $global:LASTEXITCODE = 0
+    return
+  }
   python -m pytest -q
 }
 
 Step "JavaScript syntax" {
   node --check voice/anime-demo/render.mjs
+  if ($LASTEXITCODE -ne 0) { throw "render.mjs failed" }
   Get-ChildItem voice/anime-demo/src -Recurse -Filter *.js | ForEach-Object {
     node --check $_.FullName
+    if ($LASTEXITCODE -ne 0) { throw "$($_.Name) failed" }
   }
   Write-Host "  ok"
 }
