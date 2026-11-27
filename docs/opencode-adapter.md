@@ -14,11 +14,13 @@ Patch: [`../patches/reelmimic-opencode-agent.patch`](../patches/reelmimic-openco
 |---|---|
 | `app/shared/types.ts` | `AgentKind` includes `'opencode'` |
 | `app/server/agents/index.ts` | Detects `opencode`, runs `opencode run`, parses its JSON stream, resumes sessions |
-| `app/server/index.ts` | Accepts `opencode` when creating a project |
-| `app/web/src/App.tsx` | Adds OpenCode to the agent picker and header status |
+| `app/server/index.ts` | Accepts `opencode`, serves `/api/custom-api` |
+| `app/server/custom-api.ts` | Stores the key, writes the OpenCode provider config |
+| `app/web/src/App.tsx` | OpenCode picker, header status, API key panel |
 | `app/web/src/Chat.tsx` | Shows the OpenCode label |
 | `app/server/agents/index.test.ts` | Tests the OpenCode parser |
 | `app/server/env.ts` | Documents the new environment variables |
+| `.gitignore` | Ignores the generated `.opencode/` config |
 
 The adapter runs:
 
@@ -67,7 +69,37 @@ Put overrides in `~/.reelmimic/secrets.json` or the environment:
 }
 ```
 
-### Use your own DeepSeek API key
+### Add an API key in the app
+
+![Custom API settings](assets/api-key-panel.png)
+
+1. Pick **OpenCode** in the composer.
+2. Click **API key**.
+3. Enter the key, an OpenAI-compatible base URL, and the model ID.
+4. Click **Save**.
+
+The adapter then uses the `reelmimic/custom` provider automatically. The key is
+stored in `~/.reelmimic/secrets.json`; the non-secret provider settings are
+written to `.opencode/opencode.json` (gitignored). No key is stored in the
+project or returned by the API.
+
+The endpoint must be OpenAI-compatible and the model must support tool calling.
+Examples:
+
+| Provider | Base URL | Model |
+|---|---|---|
+| DeepSeek | `https://api.deepseek.com/v1` | `deepseek-chat` |
+| OpenAI | `https://api.openai.com/v1` | `gpt-4.1` |
+| OpenRouter | `https://openrouter.ai/api/v1` | `openai/gpt-4.1` |
+| vLLM / LM Studio | your local `/v1` URL | your served model |
+
+Click **Remove** to go back to `OPENCODE_MODEL`.
+
+ReelMimic's chat is headless: OpenCode's interactive slash menu (typing `/`)
+is not available inside an `opencode run` turn. Custom commands can be defined
+in OpenCode's config, but ReelMimic does not parse slash commands yet.
+
+### Use your own DeepSeek API key directly
 
 `opencode-go/...` is OpenCode Go's hosted provider. To use your own DeepSeek
 API key instead:

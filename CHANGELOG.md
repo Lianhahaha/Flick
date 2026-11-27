@@ -20,6 +20,9 @@ All notable changes to Flick are documented here. The format follows
 - OpenCode director adapter patch for ReelMimic
 - `OPENCODE_MODEL`, `OPENCODE_AGENT`, and `OPENCODE_BIN` configuration
 - OpenCode option in the ReelMimic composer and header
+- API key button for any OpenAI-compatible endpoint
+- Custom provider config generated in `.opencode/opencode.json`
+- Server-side API key storage in `~/.reelmimic/secrets.json` (never in a project)
 - Bootstrap `-WithOpenCode` flag
 - Architecture, setup, licensing, roadmap, and OpenCode adapter docs
 

@@ -64,9 +64,12 @@ ReelMimic upstream only lists Claude Code and Codex. This repo adds an
 DeepSeek V4.1 Flash. Apply it with `scripts/bootstrap.ps1 -WithOpenCode`; see
 [docs/opencode-adapter.md](docs/opencode-adapter.md).
 
-To use your own DeepSeek API key instead of the shared OpenCode Go provider,
-set `OPENCODE_MODEL` to `deepseek/deepseek-v4-pro` (better) or
-`deepseek/deepseek-flash` (faster/cheaper) in `~/.reelmimic/secrets.json`.
+Use the **API key** button in the composer to add any OpenAI-compatible
+endpoint (DeepSeek, OpenAI, OpenRouter, vLLM, LM Studio). The key is stored in
+`~/.reelmimic/secrets.json`, not in the project.
+
+You can also set `OPENCODE_MODEL` directly to `deepseek/deepseek-v4-pro`
+(better) or `deepseek/deepseek-flash` (faster/cheaper).
 
 ## Why this stack
 

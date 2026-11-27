@@ -87,6 +87,18 @@ npm run build
 Restart the server. The header should show a green **OpenCode** pill, and the
 composer should offer **OpenCode**.
 
+### 2c. Use your own API key from the UI
+
+Select **OpenCode** in the composer, click **API key**, and enter:
+
+- API key
+- Base URL (for example `https://api.deepseek.com/v1`)
+- Model ID (for example `deepseek-chat`)
+
+Click **Save**. The key stays in `~/.reelmimic/secrets.json`; the non-secret
+provider settings go to `.opencode/opencode.json`. No server restart is needed.
+Click **Remove** to return to the default OpenCode model.
+
 Defaults:
 
 ```text

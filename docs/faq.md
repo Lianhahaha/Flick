@@ -37,7 +37,10 @@ The voice demo and the rendered MP4 need no agent at all.
 
 ## Which DeepSeek model should I use?
 
-If you use your own DeepSeek API key through OpenCode:
+The easiest way is the **API key** button in the ReelMimic composer: pick
+OpenCode, click API key, and enter any OpenAI-compatible base URL + model.
+
+If you use your own DeepSeek API key through OpenCode directly:
 
 - `deepseek/deepseek-flash` — faster and cheaper; good for iteration.
 - `deepseek/deepseek-v4-pro` — better at long code/planning turns; higher cost.
