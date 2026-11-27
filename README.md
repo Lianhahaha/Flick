@@ -16,7 +16,7 @@ This repo contains the voice, lip-sync, and anime-cel pieces we built while
 evaluating an AI agent that can generate real 2D character animation — not just
 motion graphics.
 
-The demo output is a **9.3-second, 1920×1080 anime-cel clip**: Hina walks in
+The demo output is a **10.1-second, 1920×1080 anime-cel clip**: Hina walks in
 from the left, stops, and speaks. Her voice is generated locally with Piper TTS,
 and her mouth is driven by Rhubarb Lip Sync cues rather than a random lip flap.
 
@@ -47,7 +47,7 @@ and her mouth is driven by Rhubarb Lip Sync cues rather than a random lip flap.
 | Rhubarb A–H → ReelMimic mouth names | ✅ Works |
 | 2D anime character walking | ✅ Works |
 | 2D anime character talking with voice | ✅ Works |
-| 9.3 s rendered MP4 with audio | ✅ Works |
+| 10.1 s rendered MP4 with audio | ✅ Works |
 | OpenCode director (DeepSeek V4.1 Flash) | ✅ Works via local patch |
 | Tagalog/Filipino support | ⚠️ Phonetic recognizer; needs a Filipino voice model |
 | Multi-character dialogue scene | 🔜 Next |
@@ -178,7 +178,7 @@ python tts_lipsync.py "Kumusta! Ako si Hina." --out demo/line1 --phonetic
 |---|---|
 | Resolution | 1920×1080 |
 | Frame rate | 24 fps (character animation on twos) |
-| Duration | 9.3 s |
+| Duration | 10.1 s |
 | Video | H.264 |
 | Audio | AAC |
 | Voice | Piper `en_US-lessac-medium` |

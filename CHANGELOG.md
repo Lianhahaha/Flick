@@ -25,6 +25,12 @@ All notable changes to Flick are documented here. The format follows
 - Removed a duplicate demo audio file
 - Roadmap updated with OpenCode and public-polish status
 
+### Fixed
+
+- Render the full 10.1 s voice track instead of cutting the last 0.8 s
+- Keep the final subtitle visible through the last line
+- Remove an absolute local path from the Rhubarb metadata
+
 ## [0.2.0] — 2026-11-26
 
 ### Added

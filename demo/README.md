@@ -2,7 +2,7 @@
 
 ![Hina walking and talking](hina-walking-talking.jpg)
 
-A 9.3-second anime-cel clip rendered with ReelMimic's 2D engine.
+A 10.1-second anime-cel clip rendered with ReelMimic's 2D engine.
 
 ## What happens
 
@@ -18,7 +18,7 @@ A 9.3-second anime-cel clip rendered with ReelMimic's 2D engine.
 |---|---|
 | Resolution | 1920×1080 |
 | Frame rate | 24 fps (character on twos) |
-| Duration | 9.3 s |
+| Duration | 10.1 s |
 | Video | H.264 |
 | Audio | AAC |
 | Voice | Piper `en_US-lessac-medium` |

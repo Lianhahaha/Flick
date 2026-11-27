@@ -7,7 +7,7 @@
 - [x] Rhubarb A–H → ReelMimic `a/i/u/e/o/n`
 - [x] Anime-cel walking shot
 - [x] Anime-cel medium close-up talking shot
-- [x] 9.3 s MP4 with H.264 video + AAC audio
+- [x] 10.1 s MP4 with H.264 video + AAC audio
 - [x] Standalone browser demo with embedded audio
 - [x] Windows launchers
 - [x] Bootstrap script for upstream clones and voice tools

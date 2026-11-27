@@ -10,7 +10,7 @@ npm install
 npm run render
 ```
 
-Output: `out/video.mp4` — 1920×1080, 24 fps, ~9.3 s, H.264 + AAC.
+Output: `out/video.mp4` — 1920×1080, 24 fps, ~10.1 s, H.264 + AAC.
 
 For a quick preview sheet:
 

@@ -15,7 +15,7 @@ Open [`demo/hina-walking-talking.mp4`](demo/hina-walking-talking.mp4).
 Hina walks in, stops, and speaks. The voice is Piper TTS; the mouth is driven by
 Rhubarb Lip Sync cues.
 
-Render specs: 1920×1080, 24 fps, 9.3 s, H.264 + AAC.
+Render specs: 1920×1080, 24 fps, 10.1 s, H.264 + AAC.
 
 ## 2. The interactive voice demo
 

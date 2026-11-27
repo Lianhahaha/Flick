@@ -44,7 +44,7 @@ the mouth: instead of `talk(t)` choosing a random mouth shape, the scene calls
 ### 1. Piper TTS
 
 - Local, offline neural TTS.
-- Fast on CPU (the 9.3 s line rendered in about 0.6 s on this machine).
+- Fast on CPU (the 10.1 s line rendered in about 0.6 s on this machine).
 - Voice model is a separate `.onnx` + `.json` pair.
 - `voice/tts_lipsync.py` wraps Piper and Rhubarb.
 
@@ -121,7 +121,7 @@ voice pipeline itself is agent-agnostic.
 
 ## Current limits
 
-- One character, one line, one 9.3 s clip.
+- One character, one line, one 10.1 s clip.
 - No dialogue schema yet.
 - No multi-character conversation.
 - No timeline editor.

@@ -61,7 +61,7 @@ fast; the animation review loop is the slow part.
 
 ## Can it make a 10-minute episode?
 
-Not automatically. The current demo is 9.3 s; ReelMimic targets 30–60 s. Longer
+Not automatically. The current demo is 10.1 s; ReelMimic targets 30–60 s. Longer
 episodes need more shots, more review, and human cleanup.
 
 ## Why does the demo cut to a close-up?
