@@ -6,6 +6,7 @@
 
 [![CI](https://github.com/Lianhahaha/Flick/actions/workflows/ci.yml/badge.svg)](https://github.com/Lianhahaha/Flick/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-7A6BFF)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/Lianhahaha/Flick?label=release)](https://github.com/Lianhahaha/Flick/releases/latest)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)
 ![Node](https://img.shields.io/badge/node-22.18%2B-339933)
 ![Status: prototype](https://img.shields.io/badge/status-prototype-F59E0B)
