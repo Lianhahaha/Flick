@@ -4,6 +4,16 @@ All notable changes to Flick are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.3] - 2026-11-27
+
+### Fixed
+
+- New projects default to fast instead of fine: fine-by-default made a 7 s film spend hours in the cast gate
+- Agent turns are capped at 45 minutes (`AGENT_TIMEOUT_MS`)
+- The character gate is capped at 45 minutes (`CAST_BUDGET_MS`)
+- Cast review is limited to the character sheet, key poses, and eight crops per character instead of the whole film
+- Short films (≤15 s) only generate the expressions/poses the plan uses
+
 ## [0.3.2] - 2026-11-27
 
 ### Fixed
