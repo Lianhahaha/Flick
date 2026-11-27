@@ -77,6 +77,11 @@ ReelMimic runs multiple agents, renders frames in headless Chrome, and reviews
 each shot. A 30–60 s film can take 1–3.5 hours. The voice/lip-sync step itself is
 fast; the animation review loop is the slow part.
 
+New projects now default to **fast**, a single agent turn is capped at
+**45 minutes**, and the character gate has a **45-minute** budget. A 7 s film
+should not sit for hours; if it does, press **Stop** and check the log. Raise
+`AGENT_TIMEOUT_MS` / `CAST_BUDGET_MS` only for intentionally long hero shots.
+
 ## Can it make a 10-minute episode?
 
 Not automatically. The current demo is 10.1 s; ReelMimic targets 30–60 s. Longer
