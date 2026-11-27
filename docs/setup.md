@@ -164,6 +164,7 @@ Then re-render the frames.
 | Port 4318 already used | Open <http://localhost:4318> — the server is already running |
 | OpenCode patch does not apply | Upstream changed; use `git apply -3 ../patches/reelmimic-opencode-agent.patch` and resolve conflicts |
 | OpenCode not shown in ReelMimic | Run `opencode --version`, then click the agent pill to re-check |
+| `Insufficient Balance` from DeepSeek | Top up the DeepSeek account, or set `OPENCODE_MODEL=opencode-go/deepseek-v4.1-flash` |
 
 ## File sizes
 

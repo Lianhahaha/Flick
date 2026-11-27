@@ -47,6 +47,9 @@ Set `OPENCODE_MODEL` in `~/.reelmimic/secrets.json` and restart ReelMimic. The
 the max variant, not a model called "DeepSeek Max". See
 [`opencode-adapter.md`](opencode-adapter.md).
 
+If the direct model returns `Insufficient Balance`, the API key is configured
+but the DeepSeek account has no credit. Top up or use `opencode-go/...`.
+
 ## Why is the repo only ~5.6 MB?
 
 Because it contains source, docs, and the demo — not the 1 GB of upstream clones,

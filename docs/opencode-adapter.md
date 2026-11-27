@@ -105,6 +105,11 @@ The OpenCode UI label `OpenCode Go · max` means **OpenCode Go provider, max
 variant**. It is not a separate "DeepSeek Max" model. The adapter does not add a
 `#max` variant; set one explicitly only if your provider supports it.
 
+If the direct model fails with `provider.quota` / `Insufficient Balance`, the
+DeepSeek API key is valid but the account has no credit. Top up at
+<https://platform.deepseek.com> or switch back to
+`opencode-go/deepseek-v4.1-flash` until the balance is available.
+
 ## Verify in ReelMimic
 
 ```powershell
