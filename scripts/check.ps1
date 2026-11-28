@@ -3,7 +3,7 @@
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
-
+//aight
 $failed = 0
 function Step([string]$Name, [scriptblock]$Body) {
   Write-Host "`n== $Name" -ForegroundColor Cyan
